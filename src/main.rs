@@ -196,6 +196,94 @@ const ENHANCE_SCRIPT: &str = r##"
     }
     tickCountdown();
     window.__slCountdownInterval = setInterval(tickCountdown, 60000);
+
+    function waitForMainStylesheet() {
+        return new Promise((resolve) => {
+            const start = Date.now();
+            function check() {
+                const hero = document.querySelector(".hero-sanctuary");
+                if (hero) {
+                    const cs = window.getComputedStyle(hero);
+                    if (cs && cs.position === "relative" && parseFloat(cs.minHeight || "0") > 100) {
+                        resolve();
+                        return;
+                    }
+                }
+                if (Date.now() - start > 5000) {
+                    resolve();
+                    return;
+                }
+                window.requestAnimationFrame(check);
+            }
+            check();
+        });
+    }
+
+    function waitForImage(img) {
+        if (!img) return Promise.resolve();
+        const decodeImg = () =>
+            typeof img.decode === "function"
+                ? img.decode().catch(() => {})
+                : Promise.resolve();
+        if (img.complete) {
+            return img.naturalWidth > 0 ? decodeImg() : Promise.resolve();
+        }
+        return new Promise((resolve) => {
+            const done = () => {
+                img.removeEventListener("load", onLoad);
+                img.removeEventListener("error", onErr);
+                resolve();
+            };
+            const onLoad = () => decodeImg().finally(done);
+            const onErr = () => done();
+            img.addEventListener("load", onLoad, { once: true });
+            img.addEventListener("error", onErr, { once: true });
+        });
+    }
+
+    if (!root.classList.contains("app-ready") && !window.__slBooting) {
+        window.__slBooting = true;
+        const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
+
+        waitForMainStylesheet()
+            .then(() => {
+                const heroBg = document.querySelector(".hero-ghibli-img");
+                const cameoImg = document.querySelector(".couple-cameo-img");
+                const fontsPromise =
+                    document.fonts && document.fonts.ready
+                        ? document.fonts.ready.catch(() => {})
+                        : Promise.resolve();
+                return Promise.race([
+                    Promise.all([
+                        fontsPromise,
+                        waitForImage(heroBg),
+                        waitForImage(cameoImg),
+                    ]),
+                    timeout(2400),
+                ]);
+            })
+            .finally(() => {
+                tickCountdown();
+                updateScrollState();
+                window.requestAnimationFrame(() => {
+                    window.requestAnimationFrame(() => {
+                        if (window.__slBootFailSafe) {
+                            clearTimeout(window.__slBootFailSafe);
+                            window.__slBootFailSafe = null;
+                        }
+                        root.classList.add("app-ready");
+                        const curtain = document.getElementById("app-boot-curtain");
+                        if (curtain) {
+                            setTimeout(() => {
+                                if (curtain.parentNode) {
+                                    curtain.parentNode.removeChild(curtain);
+                                }
+                            }, 700);
+                        }
+                    });
+                });
+            });
+    }
 })();
 "##;
 
@@ -435,10 +523,6 @@ fn App() -> Element {
                 "ലിജു & ഷാരോൺ | വിവാഹ ക്ഷണക്കത്ത് • 24 ജനുവരി 2027",
             )}
         }
-        document::Link {
-            rel: "stylesheet",
-            href: "https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Malayalam:wght@400;500;600;700&family=Noto+Serif+Malayalam:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap",
-        }
         document::Stylesheet { href: MAIN_CSS }
 
         Navbar {}
@@ -598,6 +682,9 @@ fn CoupleGhibliCameo() -> Element {
                     src: COUPLE_GHIBLI_CAMEO,
                     alt: "Studio Ghibli watercolor portrait of Liju in an Ivory Mundu & Jubba and Sharon in a Cream & Gold Kerala Saree",
                     class: "couple-cameo-img",
+                    loading: "eager",
+                    decoding: "async",
+                    "fetchpriority": "high",
                 }
                 div { class: "cameo-sunbeam-veil", "aria-hidden": "true" }
             }
@@ -616,6 +703,9 @@ fn HeroInvitationScene() -> Element {
                     src: HERO_GHIBLI_BG,
                     alt: "",
                     class: "hero-ghibli-img",
+                    loading: "eager",
+                    decoding: "async",
+                    "fetchpriority": "high",
                 }
                 div { class: "hero-ivory-veil" }
             }
