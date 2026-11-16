@@ -1,0 +1,25 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Liju & Sharon//Wedding Invitation 2027//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:liju-sharon-reception-20270124@liju-and-sharon.netlify.app
+DTSTAMP:20261115T090000Z
+DTSTART:20270124T133000Z
+DTEND:20270124T163000Z
+SUMMARY:Liju & Sharon - Wedding Reception
+DESCRIPTION:Evening Reception of Liju & Sharon at TMK Arena\, Vadakkencherr
+ y (around 7:00 PM onwards IST).\nGoogle Maps: https://maps.app.goo.gl/6Qqg
+ u8MbnhjLqPpQ6?g_st=iw
+LOCATION:TMK Arena\, Vadakkencherry\, Kerala 678683
+URL:https://maps.app.goo.gl/6Qqgu8MbnhjLqPpQ6?g_st=iw
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-P2D
+ACTION:DISPLAY
+DESCRIPTION:Reminder: Liju & Sharon - Wedding Reception is in 2 days (Sunda
+ y\, 24 Jan 2027 around 7:00 PM IST)
+END:VALARM
+END:VEVENT
+END:VCALENDAR

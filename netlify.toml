@@ -1,0 +1,33 @@
+[build]
+publish = "target/dx/sharons_wedding/release/web/public"
+command = "export PATH=\"$HOME/.cargo/bin:$PATH\" && (rustup target list --installed | grep -qx wasm32-unknown-unknown || rustup target add wasm32-unknown-unknown) && (command -v dx >/dev/null 2>&1 || curl -sSL https://dioxus.dev/install.sh | sh) && dx bundle --web --release"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+[[headers]]
+for = "/*.wasm"
+[headers.values]
+Content-Type = "application/wasm"
+
+[[headers]]
+for = "/assets/*.wasm"
+[headers.values]
+Content-Type = "application/wasm"
+
+[[headers]]
+for = "/assets/*.ics"
+[headers.values]
+Content-Type = "text/calendar; charset=utf-8"
+
+[[headers]]
+for = "/wasm/*"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/assets/*"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"

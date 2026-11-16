@@ -1,0 +1,12 @@
+[application]
+name = "sharons_wedding"
+
+[web.app]
+title = "Liju & Sharon | Wedding Invitation • 24 Jan 2027"
+
+[web.resource]
+style = []
+script = []
+
+[web.resource.dev]
+script = []
