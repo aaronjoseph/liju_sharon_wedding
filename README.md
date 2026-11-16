@@ -14,6 +14,6 @@ dx serve --web
 # Root domain (e.g. Netlify / custom domain)
 dx bundle --web --release
 
-# GitHub Pages project subpath (/sharon_wedding/)
-dx bundle --web --release --base-path sharon_wedding
+# GitHub Pages project subpath (/liju_sharon_wedding/)
+dx bundle --web --release --base-path liju_sharon_wedding
 ```
