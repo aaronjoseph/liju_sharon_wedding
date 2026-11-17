@@ -61,11 +61,11 @@ const ENHANCE_SCRIPT: &str = r##"
     const trackedSections = [
         { id: "invitation", en: "Invitation", ml: "ക്ഷണക്കത്ത്" },
         { id: "events", en: "The Wedding Day", ml: "വിവാഹ ദിനം" },
+        { id: "memories", en: "Memory Wall", ml: "ഓർമ്മകളുടെ ചുവർ" },
         { id: "palette", en: "What to Wear", ml: "വസ്ത്രധാരണം" },
         { id: "venue", en: "Visual Route", ml: "യാത്രാ മാർഗ്ഗം" },
         { id: "stay-travel", en: "Where to Stay", ml: "താമസ സൗകര്യങ്ങൾ" },
         { id: "rsvp", en: "RSVP & Arrival", ml: "RSVP & വരവ്" },
-        { id: "memories", en: "Memory Wall", ml: "ഓർമ്മകളുടെ ചുവർ" },
     ];
     window.__slLang = window.__slLang || "en";
     let lastActiveKey = "";
@@ -590,10 +590,10 @@ fn App() -> Element {
         main { class: if current_lang == Lang::Ml { "page-shell lang-ml" } else { "page-shell" },
             HeroInvitationScene {}
             EventsSection {}
+            MemoryWallSection {}
             AttireSection {}
             VenueAndTravelSection {}
             RsvpSection {}
-            MemoryWallSection {}
         }
         Footer {}
     }
@@ -663,10 +663,10 @@ fn Navbar() -> Element {
                     aria_hidden: if menu_open() { "false" } else { "true" },
                     a { href: "#invitation", onclick: move |_| menu_open.set(false), "{tr(current, \"Invitation\", \"ക്ഷണക്കത്ത്\")}" }
                     a { href: "#events", onclick: move |_| menu_open.set(false), "{tr(current, \"The Wedding Day\", \"വിവാഹ ദിനം\")}" }
+                    a { href: "#memories", onclick: move |_| menu_open.set(false), "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}" }
                     a { href: "#palette", onclick: move |_| menu_open.set(false), "{tr(current, \"What to Wear\", \"വസ്ത്രധാരണം\")}" }
                     a { href: "#venue", onclick: move |_| menu_open.set(false), "{tr(current, \"Visual Route\", \"യാത്രാ മാർഗ്ഗം\")}" }
                     a { href: "#stay-travel", onclick: move |_| menu_open.set(false), "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}" }
-                    a { href: "#memories", onclick: move |_| menu_open.set(false), "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}" }
                     a {
                         href: "#rsvp",
                         class: "popover-rsvp-link",
@@ -1017,7 +1017,7 @@ fn AttireSection() -> Element {
                             span { class: "group-tag tag-rose", "{tr(lang, \"Ladies\", \"വനിതകൾ\")}" }
                             div { class: "lookbook-style-pills",
                                 span { class: "lookbook-pill is-rose", "{tr(lang, \"Salwar Suits\", \"സൽവാർ സ്യൂട്ട്\")}" }
-                                span { class: "lookbook-pill is-rose", "{tr(lang, \"Pastel Sarees\", \"പേസ്റ്റൽ സാരികൾ\")}" }
+                                span { class: "lookbook-pill is-rose", "{tr(lang, \"Sarees\", \"സാരികൾ\")}" }
                                 span { class: "lookbook-pill is-rose", "{tr(lang, \"Lehenga\", \"ലെഹംഗ\")}" }
                             }
                         }
@@ -2026,12 +2026,16 @@ fn MemoryWallSection() -> Element {
                 div { class: "memory-wall-board", "data-reveal": "",
                     /* Left: Compact 2-Card Polaroid Strip */
                     div { class: "memory-polaroid-grid",
-                        div { class: "memory-polaroid polaroid-tilt-left",
+                        a {
+                            href: "{MEMORY_WALL_URL}",
+                            target: "_blank",
+                            rel: "noopener noreferrer",
+                            class: "memory-polaroid polaroid-tilt-left",
                             span { class: "polaroid-pin pin-rose", "aria-hidden": "true" }
                             div { class: "polaroid-photo-frame",
                                 img {
                                     src: COUPLE_GHIBLI_CAMEO,
-                                    alt: "Liju & Sharon keepsake portrait",
+                                    alt: "Liju & Sharon keepsake portrait — open Memory Wall",
                                     loading: "lazy",
                                     decoding: "async",
                                 }
