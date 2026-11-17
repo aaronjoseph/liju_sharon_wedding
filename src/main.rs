@@ -28,6 +28,7 @@ const RECEPTION_MAP_URL: &str = "https://maps.app.goo.gl/6Qqgu8MbnhjLqPpQ6?g_st=
 
 const WHATSAPP_NUMBER: &str = "919844348064";
 const GOOGLE_SHEETS_WEBHOOK_URL: &str = "https://script.google.com/macros/s/AKfycbwc5AE_05hsVLx0QKlHUwUGxtgN8wAbkuWMrQ41i7DwVnHyaZZzgzWYwPVxRtIL9KGNGg/exec";
+const MEMORY_WALL_URL: &str = "https://photos.app.goo.gl/1gW4Lzezf9qKHPKJ6";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Lang {
@@ -63,6 +64,7 @@ const ENHANCE_SCRIPT: &str = r##"
         { id: "stay-travel", en: "Where to Stay", ml: "താമസ സൗകര്യങ്ങൾ" },
         { id: "journey-planner", en: "Journey Planner", ml: "യാത്രാ പ്ലാനർ" },
         { id: "rsvp", en: "RSVP & Arrival", ml: "RSVP & വരവ്" },
+        { id: "memories", en: "Memory Wall", ml: "ഓർമ്മകളുടെ ചുവർ" },
     ];
     window.__slLang = window.__slLang || "en";
     let lastActiveKey = "";
@@ -532,6 +534,7 @@ fn App() -> Element {
             AttireSection {}
             VenueAndTravelSection {}
             RsvpSection {}
+            MemoryWallSection {}
         }
         Footer {}
     }
@@ -605,6 +608,7 @@ fn Navbar() -> Element {
                     a { href: "#venue", onclick: move |_| menu_open.set(false), "{tr(current, \"Visual Route\", \"യാത്രാ മാർഗ്ഗം\")}" }
                     a { href: "#stay-travel", onclick: move |_| menu_open.set(false), "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}" }
                     a { href: "#journey-planner", onclick: move |_| menu_open.set(false), "{tr(current, \"Journey Planner\", \"യാത്രാ പ്ലാനർ\")}" }
+                    a { href: "#memories", onclick: move |_| menu_open.set(false), "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}" }
                     a {
                         href: "#rsvp",
                         class: "popover-rsvp-link",
@@ -2826,6 +2830,176 @@ fn RsvpSection() -> Element {
                                     disabled: !is_form_open,
                                     class: "btn btn-rose submit-btn",
                                     "{tr(lang, \"Create RSVP Note →\", \"RSVP കുറിപ്പ് തയ്യാറാക്കുക →\")}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn MemoryWallSection() -> Element {
+    let lang = use_context::<Signal<Lang>>()();
+    let link_copied = use_signal(|| false);
+
+    let whatsapp_share_msg = match lang {
+        Lang::En => format!(
+            "Liju & Sharon — Wedding Memory Wall 📸✨\nDrop & view wedding photos here: {MEMORY_WALL_URL}"
+        ),
+        Lang::Ml => format!(
+            "ലിജു & ഷാരോൺ — വെഡ്ഡിംഗ് മെമ്മറി വാൾ 📸✨\nവിവാഹ ചിത്രങ്ങൾ ഇവിടെ ചേർക്കാനും കാണാനും: {MEMORY_WALL_URL}"
+        ),
+    };
+    let whatsapp_share_url = format!(
+        "https://wa.me/?text={}",
+        percent_encode(&whatsapp_share_msg)
+    );
+
+    rsx! {
+        section { id: "memories", class: "chapter-memories",
+            div { class: "section-container",
+                div { class: "section-header", "data-reveal": "",
+                    span { class: "section-eyebrow",
+                        "{tr(lang, \"Shared Google Photos Album\", \"പങ്കുവെച്ച ഗൂഗിൾ ഫോട്ടോസ് ആൽബം\")}"
+                    }
+                    h2 { class: "section-heading",
+                        "{tr(lang, \"The Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}"
+                    }
+                    div { class: "filigree-divider" }
+                    p { class: "section-subcopy",
+                        "{tr(lang, \"Captured a candid smile, church blessing, or reception laugh? Drop the photos and videos you click with Liju & Sharon straight into our shared album — and relive everyone’s favourite moments together.\", \"പള്ളിയിലെ ആശീർവാദ നിമിഷങ്ങളോ വിരുന്നിലെ സന്തോഷങ്ങളോ ക്യാമറയിൽ പകർത്തിയോ? ലിജുവിനോടും ഷാരോണിനോടുമൊപ്പമുള്ള നിങ്ങളുടെ പ്രിയപ്പെട്ട ചിത്രങ്ങളും വീഡിയോകളും ഞങ്ങളുടെ ഷെയേർഡ് ആൽബത്തിലേക്ക് ചേർക്കൂ.\")}"
+                    }
+                }
+
+                div { class: "memory-wall-board", "data-reveal": "",
+                    /* Left: Tactile Studio Ghibli Keepsake Polaroid Pinboard */
+                    div { class: "memory-polaroid-grid",
+                        div { class: "memory-polaroid polaroid-tilt-left",
+                            span { class: "polaroid-pin pin-rose", "aria-hidden": "true" }
+                            div { class: "polaroid-photo-frame",
+                                img {
+                                    src: COUPLE_GHIBLI_CAMEO,
+                                    alt: "Liju & Sharon keepsake portrait",
+                                    loading: "lazy",
+                                    decoding: "async",
+                                }
+                            }
+                            span { class: "polaroid-caption",
+                                "{tr(lang, \"Liju & Sharon\", \"ലിജു & ഷാരോൺ\")}"
+                            }
+                        }
+
+                        div { class: "memory-polaroid polaroid-tilt-right",
+                            span { class: "polaroid-pin pin-gold", "aria-hidden": "true" }
+                            div { class: "polaroid-photo-frame",
+                                img {
+                                    src: CHURCH_GHIBLI,
+                                    alt: "Lourde Matha Forane Church blessing illustration",
+                                    loading: "lazy",
+                                    decoding: "async",
+                                }
+                            }
+                            span { class: "polaroid-caption",
+                                "{tr(lang, \"Church Blessings\", \"പള്ളിയിലെ ആശീർവാദം\")}"
+                            }
+                        }
+
+                        div { class: "memory-polaroid polaroid-tilt-soft-left",
+                            span { class: "polaroid-pin pin-sage", "aria-hidden": "true" }
+                            div { class: "polaroid-photo-frame",
+                                img {
+                                    src: ATTIRE_GUESTS_GHIBLI,
+                                    alt: "Family and friends celebrating together",
+                                    loading: "lazy",
+                                    decoding: "async",
+                                }
+                            }
+                            span { class: "polaroid-caption",
+                                "{tr(lang, \"Family & Friends\", \"പ്രിയപ്പെട്ടവർക്കൊപ്പം\")}"
+                            }
+                        }
+
+                        a {
+                            href: "{MEMORY_WALL_URL}",
+                            target: "_blank",
+                            rel: "noopener noreferrer",
+                            class: "memory-polaroid polaroid-drop-slot polaroid-tilt-soft-right",
+                            span { class: "polaroid-pin pin-gold", "aria-hidden": "true" }
+                            div { class: "polaroid-drop-well",
+                                span { class: "drop-camera-badge", "aria-hidden": "true", "📸" }
+                                span { class: "drop-slot-title",
+                                    "{tr(lang, \"+ Your Snapshot\", \"+ നിങ്ങളുടെ ചിത്രം\")}"
+                                }
+                                span { class: "drop-slot-sub",
+                                    "{tr(lang, \"Tap to drop in ↗\", \"ഇവിടെ ചേർക്കാം ↗\")}"
+                                }
+                            }
+                            span { class: "polaroid-caption polaroid-caption-accent",
+                                "{tr(lang, \"Add to Memory Wall\", \"മെമ്മറി വാളിൽ ചേർക്കൂ\")}"
+                            }
+                        }
+                    }
+
+                    /* Right: Shared Album Drop & View Hub */
+                    div { class: "memory-drop-hub",
+                        span { class: "memory-hub-badge",
+                            "{tr(lang, \"Open to All Guests • Full Resolution\", \"എല്ലാ അതിഥികൾക്കും ചേർക്കാം • ഫുൾ ക്വാളിറ്റി\")}"
+                        }
+                        h3 { class: "memory-hub-title",
+                            "{tr(lang, \"Drop Your Photos & Browse the Album\", \"നിങ്ങളുടെ ചിത്രങ്ങൾ ചേർക്കൂ, ആൽബം കാണൂ\")}"
+                        }
+                        p { class: "memory-hub-copy",
+                            "{tr(lang, \"From travel moments on the way to Vadakkencherry to church vows at Lourde Matha Forane Church and evening celebrations at TMK Arena — upload straight from your phone camera roll anytime before, during, or after 24 January 2027.\", \"വടക്കഞ്ചേരിയിലേക്കുള്ള യാത്രാ നിമിഷങ്ങൾ മുതൽ ലൂർദ് മാതാ ഫൊറോന പള്ളിയിലെ തിരുവിവാഹവും ടി.എം.കെ അരീനയിലെ സായാഹ്ന വിരുന്നും വരെ — നിങ്ങളുടെ ഫോണിൽ പകർത്തിയ നല്ല നിമിഷങ്ങൾ എപ്പോൾ വേണമെങ്കിലും ഈ ആൽബത്തിലേക്ക് ചേർക്കാം.\")}"
+                        }
+
+                        div { class: "memory-tags-row",
+                            span { class: "memory-tag-chip",
+                                "{tr(lang, \"✦ Candid Smiles & Selfies\", \"✦ സന്തോഷ നിമിഷങ്ങൾ\")}"
+                            }
+                            span { class: "memory-tag-chip",
+                                "{tr(lang, \"✦ Short Video Clips\", \"✦ ചെറിയ വീഡിയോകൾ\")}"
+                            }
+                            span { class: "memory-tag-chip",
+                                "{tr(lang, \"✦ View Everyone’s Uploads\", \"✦ എല്ലാവരുടെയും ചിത്രങ്ങൾ\")}"
+                            }
+                        }
+
+                        div { class: "memory-cta-stack",
+                            a {
+                                href: "{MEMORY_WALL_URL}",
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                class: "btn btn-rose memory-primary-cta",
+                                "{tr(lang, \"Open Google Photos Memory Wall ↗\", \"ഗൂഗിൾ ഫോട്ടോസ് മെമ്മറി വാൾ തുറക്കുക ↗\")}"
+                            }
+
+                            div { class: "memory-secondary-actions",
+                                button {
+                                    r#type: "button",
+                                    class: if link_copied() {
+                                        "memory-util-btn is-copied"
+                                    } else {
+                                        "memory-util-btn"
+                                    },
+                                    onclick: move |_| {
+                                        copy_with_feedback(MEMORY_WALL_URL.to_string(), link_copied);
+                                    },
+                                    if link_copied() {
+                                        "{tr(lang, \"✓ Album Link Copied!\", \"✓ ആൽബം ലിങ്ക് പകർത്തി!\")}"
+                                    } else {
+                                        "{tr(lang, \"Copy Album Link\", \"ആൽബം ലിങ്ക് പകർത്തുക\")}"
+                                    }
+                                }
+
+                                a {
+                                    href: "{whatsapp_share_url}",
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                    class: "memory-util-btn",
+                                    "{tr(lang, \"Share Link on WhatsApp ↗\", \"വാട്സ്ആപ്പിൽ പങ്കുവെക്കുക ↗\")}"
                                 }
                             }
                         }
