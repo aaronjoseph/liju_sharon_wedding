@@ -357,7 +357,6 @@ struct Swatch {
 }
 
 struct EventInfo {
-    numeral: &'static str,
     badge: &'static str,
     badge_ml: &'static str,
     title: &'static str,
@@ -399,7 +398,6 @@ const ATTIRE_SWATCHES: &[Swatch] = &[
 
 const EVENTS: &[EventInfo] = &[
     EventInfo {
-        numeral: "I",
         badge: "Sunday • 3:00 PM",
         badge_ml: "ഞായർ • 3:00 PM",
         title: "Wedding",
@@ -416,7 +414,6 @@ const EVENTS: &[EventInfo] = &[
         calendar_ics: WEDDING_ICS,
     },
     EventInfo {
-        numeral: "II",
         badge: "Sunday • 6:30 PM",
         badge_ml: "ഞായർ • 6:30 PM",
         title: "Reception",
@@ -919,7 +916,6 @@ fn EventsSection() -> Element {
                     for event in EVENTS {
                         article { class: "arch-event-card", key: "{event.title}",
                             div { class: "card-top-row",
-                                span { class: "numeral-medallion", "{event.numeral}" }
                                 span { class: "event-badge", "{tr(lang, event.badge, event.badge_ml)}" }
                             }
                             h3 { "{tr(lang, event.title, event.title_ml)}" }
