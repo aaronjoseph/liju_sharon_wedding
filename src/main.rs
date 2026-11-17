@@ -17,7 +17,7 @@ const RSVP_SHARON_FOUNTAIN: Asset = asset!("/assets/rsvp_sharon_fountain.jpg");
 
 const WEDDING_ICS: Asset = asset!("/assets/liju_sharon_wedding.ics");
 const RECEPTION_ICS: Asset = asset!("/assets/liju_sharon_reception.ics");
-const MALAYALAM_WEDDING_BGM: Asset = asset!("/assets/malayalam_wedding_bgm.mp3");
+const WEDDING_BGM: Asset = asset!("/assets/wedding_bgm.m4a");
 
 const CHURCH_NAME: &str = "Lourde Matha Forane Church";
 const CHURCH_ADDRESS: &str = "Vadakkencherry, Kerala 678683";
@@ -692,7 +692,7 @@ fn BackgroundMusicFab() -> Element {
         div { class: "bgm-dock",
             audio {
                 id: "wedding-bgm",
-                src: MALAYALAM_WEDDING_BGM,
+                src: WEDDING_BGM,
                 autoplay: true,
                 r#loop: true,
                 preload: "auto",
@@ -710,30 +710,24 @@ fn BackgroundMusicFab() -> Element {
                 },
                 aria_pressed: if playing { "true" } else { "false" },
                 aria_label: if playing {
-                    tr(lang, "Stop instrumental wedding music", "വിവാഹ സംഗീതം നിർത്തുക")
+                    tr(lang, "Mute background music", "സംഗീതം നിർത്തുക")
                 } else {
-                    tr(lang, "Play instrumental wedding music", "വിവാഹ സംഗീതം കേൾക്കാം")
+                    tr(lang, "Play background music", "സംഗീതം കേൾക്കാം")
                 },
                 span { class: "bgm-disc", "aria-hidden": "true",
-                    if playing {
-                        span { class: "bgm-eq",
-                            span { class: "bgm-eq-bar b-1" }
-                            span { class: "bgm-eq-bar b-2" }
-                            span { class: "bgm-eq-bar b-3" }
-                        }
-                    } else {
-                        span { class: "bgm-note-glyph", "♪" }
-                    }
-                }
-                span { class: "bgm-label-stack",
-                    span { class: "bgm-kicker",
-                        "{tr(lang, \"Can’t Help Falling In Love\", \"വിവാഹ സംഗീതം\")}"
-                    }
-                    span { class: "bgm-status-text",
-                        if playing {
-                            "{tr(lang, \"Stop Music\", \"നിർത്തുക\")}"
-                        } else {
-                            "{tr(lang, \"Play Music\", \"സംഗീതം കേൾക്കാം\")}"
+                    svg {
+                        class: "bgm-icon-svg",
+                        view_box: "0 0 24 24",
+                        fill: "none",
+                        stroke: "currentColor",
+                        "stroke-width": "2",
+                        "stroke-linecap": "round",
+                        "stroke-linejoin": "round",
+                        path { d: "M9 18V5l12-2v13" }
+                        circle { cx: "6", cy: "18", r: "3" }
+                        circle { cx: "18", cy: "16", r: "3" }
+                        if !playing {
+                            line { class: "bgm-slash", x1: "3", y1: "3", x2: "21", y2: "21" }
                         }
                     }
                 }
