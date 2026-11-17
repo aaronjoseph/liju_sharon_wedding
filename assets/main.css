@@ -678,10 +678,10 @@ h4 {
     font-family: "Lora", Georgia, serif;
     font-style: italic;
     font-size: clamp(0.98rem, 1.8vw, 1.12rem);
-    line-height: 1.52;
+    line-height: 1.56;
     color: var(--ink-muted);
     max-width: 33rem;
-    margin: 0.15rem auto 0.5rem;
+    margin: 0.25rem auto 1.15rem;
 }
 
 /* Compact Studio Ghibli Animated Couple Cameo Overlay */
@@ -690,7 +690,7 @@ h4 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.95rem;
+    margin-bottom: 1.65rem;
     animation: ghibli-cameo-float 6.5s ease-in-out infinite;
 }
 
@@ -862,14 +862,14 @@ h4 {
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: center;
-    gap: 0.2rem 1.2rem;
+    gap: 0.2rem 1.25rem;
     font-family: "Great Vibes", cursive;
     font-size: clamp(4.1rem, 9.6vw, 7.1rem);
     font-weight: 400;
-    line-height: 0.98;
+    line-height: 1.08;
     color: var(--ink-espresso);
     text-shadow: 0 4px 22px rgba(255, 253, 249, 0.95);
-    margin-bottom: 1.35rem;
+    margin-bottom: 2.05rem;
 }
 
 .monument-amp {
@@ -3963,7 +3963,7 @@ html.reveal-ready [data-reveal].is-visible {
     }
 
     .couple-cameo-stage {
-        margin-bottom: 0.85rem;
+        margin-bottom: 1.35rem;
     }
 
     .couple-cameo-frame {
@@ -3973,15 +3973,16 @@ html.reveal-ready [data-reveal].is-visible {
 
     .hero-invite-lead {
         font-size: 0.93rem;
-        line-height: 1.48;
+        line-height: 1.52;
         max-width: 19.5rem;
-        margin: 0.1rem auto 0.45rem;
+        margin: 0.2rem auto 0.95rem;
     }
 
     .couple-monument {
         font-size: clamp(3.1rem, 12.8vw, 4.2rem);
         gap: 0.12rem 0.55rem;
-        margin-bottom: 1.15rem;
+        line-height: 1.08;
+        margin-bottom: 1.65rem;
     }
 
     .monument-amp {
