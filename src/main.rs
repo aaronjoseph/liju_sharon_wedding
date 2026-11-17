@@ -2130,7 +2130,7 @@ fn Footer() -> Element {
                     "{tr(lang, \"Sunday, 24 January 2027 • Vadakkencherry, Kerala\", \"ഞായർ, 24 ജനുവരി 2027 • വടക്കഞ്ചേരി, കേരളം\")}"
                 }
                 p { class: "footer-families",
-                    "{tr(lang, \"Kadankavil & Kalloor Families\", \"കടങ്കാവിൽ & കല്ലൂർ കുടുംബങ്ങൾ\")}"
+                    "{tr(lang, \"With love, Liya, Aaron & Hrudya\", \"സ്നേഹത്തോടെ, ലിയ, ആരൺ & ഹൃദ്യ\")}"
                 }
                 a { href: "#top", class: "footer-top-link", "{tr(lang, \"Back to Top ↑\", \"മുകളിലേക്ക് ↑\")}" }
             }
