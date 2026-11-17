@@ -727,7 +727,7 @@ fn BackgroundMusicFab() -> Element {
                 }
                 span { class: "bgm-label-stack",
                     span { class: "bgm-kicker",
-                        "{tr(lang, \"Canon in D\", \"വിവാഹ സംഗീതം\")}"
+                        "{tr(lang, \"Can’t Help Falling In Love\", \"വിവാഹ സംഗീതം\")}"
                     }
                     span { class: "bgm-status-text",
                         if playing {
@@ -2023,7 +2023,7 @@ fn MemoryWallSection() -> Element {
     rsx! {
         section { id: "memories", class: "chapter-memories",
             div { class: "section-container",
-                div { class: "section-header", "data-reveal": "",
+                div { class: "section-header header-compact", "data-reveal": "",
                     span { class: "section-eyebrow",
                         "{tr(lang, \"Shared Google Photos Album\", \"പങ്കുവെച്ച ഗൂഗിൾ ഫോട്ടോസ് ആൽബം\")}"
                     }
@@ -2031,13 +2031,10 @@ fn MemoryWallSection() -> Element {
                         "{tr(lang, \"The Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}"
                     }
                     div { class: "filigree-divider" }
-                    p { class: "section-subcopy",
-                        "{tr(lang, \"Captured a candid smile, church blessing, or reception laugh? Drop the photos and videos you click with Liju & Sharon straight into our shared album — and relive everyone’s favourite moments together.\", \"പള്ളിയിലെ ആശീർവാദ നിമിഷങ്ങളോ വിരുന്നിലെ സന്തോഷങ്ങളോ ക്യാമറയിൽ പകർത്തിയോ? ലിജുവിനോടും ഷാരോണിനോടുമൊപ്പമുള്ള നിങ്ങളുടെ പ്രിയപ്പെട്ട ചിത്രങ്ങളും വീഡിയോകളും ഞങ്ങളുടെ ഷെയേർഡ് ആൽബത്തിലേക്ക് ചേർക്കൂ.\")}"
-                    }
                 }
 
                 div { class: "memory-wall-board", "data-reveal": "",
-                    /* Left: Tactile Studio Ghibli Keepsake Polaroid Pinboard */
+                    /* Left: Compact 2-Card Polaroid Strip */
                     div { class: "memory-polaroid-grid",
                         div { class: "memory-polaroid polaroid-tilt-left",
                             span { class: "polaroid-pin pin-rose", "aria-hidden": "true" }
@@ -2054,41 +2051,11 @@ fn MemoryWallSection() -> Element {
                             }
                         }
 
-                        div { class: "memory-polaroid polaroid-tilt-right",
-                            span { class: "polaroid-pin pin-gold", "aria-hidden": "true" }
-                            div { class: "polaroid-photo-frame",
-                                img {
-                                    src: CHURCH_GHIBLI,
-                                    alt: "Lourde Matha Forane Church blessing illustration",
-                                    loading: "lazy",
-                                    decoding: "async",
-                                }
-                            }
-                            span { class: "polaroid-caption",
-                                "{tr(lang, \"Church Blessings\", \"പള്ളിയിലെ ആശീർവാദം\")}"
-                            }
-                        }
-
-                        div { class: "memory-polaroid polaroid-tilt-soft-left",
-                            span { class: "polaroid-pin pin-sage", "aria-hidden": "true" }
-                            div { class: "polaroid-photo-frame",
-                                img {
-                                    src: ATTIRE_GUESTS_GHIBLI,
-                                    alt: "Family and friends celebrating together",
-                                    loading: "lazy",
-                                    decoding: "async",
-                                }
-                            }
-                            span { class: "polaroid-caption",
-                                "{tr(lang, \"Family & Friends\", \"പ്രിയപ്പെട്ടവർക്കൊപ്പം\")}"
-                            }
-                        }
-
                         a {
                             href: "{MEMORY_WALL_URL}",
                             target: "_blank",
                             rel: "noopener noreferrer",
-                            class: "memory-polaroid polaroid-drop-slot polaroid-tilt-soft-right",
+                            class: "memory-polaroid polaroid-drop-slot polaroid-tilt-right",
                             span { class: "polaroid-pin pin-gold", "aria-hidden": "true" }
                             div { class: "polaroid-drop-well",
                                 span { class: "drop-camera-badge", "aria-hidden": "true", "📸" }
@@ -2105,28 +2072,13 @@ fn MemoryWallSection() -> Element {
                         }
                     }
 
-                    /* Right: Shared Album Drop & View Hub */
+                    /* Right: Compact Shared Album Drop & View Hub */
                     div { class: "memory-drop-hub",
-                        span { class: "memory-hub-badge",
-                            "{tr(lang, \"Open to All Guests • Full Resolution\", \"എല്ലാ അതിഥികൾക്കും ചേർക്കാം • ഫുൾ ക്വാളിറ്റി\")}"
-                        }
                         h3 { class: "memory-hub-title",
-                            "{tr(lang, \"Drop Your Photos & Browse the Album\", \"നിങ്ങളുടെ ചിത്രങ്ങൾ ചേർക്കൂ, ആൽബം കാണൂ\")}"
+                            "{tr(lang, \"Drop Your Wedding Photos & Videos\", \"നിങ്ങളുടെ ചിത്രങ്ങളും വീഡിയോകളും ചേർക്കൂ\")}"
                         }
                         p { class: "memory-hub-copy",
-                            "{tr(lang, \"From travel moments on the way to Vadakkencherry to church vows at Lourde Matha Forane Church and evening celebrations at TMK Arena — upload straight from your phone camera roll anytime before, during, or after 24 January 2027.\", \"വടക്കഞ്ചേരിയിലേക്കുള്ള യാത്രാ നിമിഷങ്ങൾ മുതൽ ലൂർദ് മാതാ ഫൊറോന പള്ളിയിലെ തിരുവിവാഹവും ടി.എം.കെ അരീനയിലെ സായാഹ്ന വിരുന്നും വരെ — നിങ്ങളുടെ ഫോണിൽ പകർത്തിയ നല്ല നിമിഷങ്ങൾ എപ്പോൾ വേണമെങ്കിലും ഈ ആൽബത്തിലേക്ക് ചേർക്കാം.\")}"
-                        }
-
-                        div { class: "memory-tags-row",
-                            span { class: "memory-tag-chip",
-                                "{tr(lang, \"✦ Candid Smiles & Selfies\", \"✦ സന്തോഷ നിമിഷങ്ങൾ\")}"
-                            }
-                            span { class: "memory-tag-chip",
-                                "{tr(lang, \"✦ Short Video Clips\", \"✦ ചെറിയ വീഡിയോകൾ\")}"
-                            }
-                            span { class: "memory-tag-chip",
-                                "{tr(lang, \"✦ View Everyone’s Uploads\", \"✦ എല്ലാവരുടെയും ചിത്രങ്ങൾ\")}"
-                            }
+                            "{tr(lang, \"Share candid clicks and short clips from the day straight into our shared Google Photos album.\", \"വിവാഹ ദിനത്തിലെ നല്ല നിമിഷങ്ങളും വീഡിയോകളും ഞങ്ങളുടെ ഷെയേർഡ് ഗൂഗിൾ ഫോട്ടോസ് ആൽബത്തിലേക്ക് നേരിട്ട് ചേർക്കാം.\")}"
                         }
 
                         div { class: "memory-cta-stack",
