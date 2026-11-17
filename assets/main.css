@@ -1376,7 +1376,7 @@ h4 {
 .card-top-row {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 0.75rem;
     margin-bottom: 1.05rem;
 }
@@ -1416,6 +1416,7 @@ h4 {
 .arch-event-card h3 {
     font-size: 1.65rem;
     color: var(--ink-espresso);
+    text-align: center;
     margin-bottom: 0.35rem;
 }
 
@@ -1424,6 +1425,7 @@ h4 {
     font-style: italic;
     color: var(--ink-muted);
     font-size: 0.96rem;
+    text-align: center;
     margin-bottom: 1.35rem;
 }
 
