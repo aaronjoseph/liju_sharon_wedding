@@ -417,16 +417,16 @@ const EVENTS: &[EventInfo] = &[
     },
     EventInfo {
         numeral: "II",
-        badge: "Sunday • 7:00 PM",
-        badge_ml: "ഞായർ • 7:00 PM",
+        badge: "Sunday • 6:30 PM",
+        badge_ml: "ഞായർ • 6:30 PM",
         title: "Reception",
         title_ml: "വിരുന്ന്",
         subtitle: "Celebratory dinner, music, cake cutting & happy fellowship",
         subtitle_ml: "സ്നേഹവിരുന്ന്, സംഗീതം, കേക്ക് മുറിക്കൽ & സന്തോഷസംഗമം",
         date: "Sunday, 24 January 2027",
         date_ml: "ഞായർ, 24 ജനുവരി 2027",
-        time: "7:00 PM onwards",
-        time_ml: "വൈകുന്നേരം 7:00 PM മുതൽ",
+        time: "6:30 PM onwards",
+        time_ml: "വൈകുന്നേരം 6:30 PM മുതൽ",
         venue_area: "TMK Arena, Vadakkencherry",
         venue_area_ml: "TMK അരീന, വടക്കഞ്ചേരി",
         map_url: RECEPTION_MAP_URL,
@@ -438,14 +438,14 @@ const ARRIVAL_SLOTS: &[&str] = &[
     "Jan 23 (Day Before)",
     "Jan 24 Morning",
     "Jan 24 • By 3:00 PM (Church)",
-    "Jan 24 • By 7:00 PM (Reception)",
+    "Jan 24 • By 6:30 PM (Reception)",
 ];
 
 const ARRIVAL_SLOTS_ML: &[&str] = &[
     "ജനുവരി 23 (തലേദിവസം)",
     "ജനുവരി 24 രാവിലെ",
     "ജനുവരി 24 • 3:00 PM (വിവാഹം)",
-    "ജനുവരി 24 • 7:00 PM (വിരുന്ന്)",
+    "ജനുവരി 24 • 6:30 PM (വിരുന്ന്)",
 ];
 
 /// Percent-encodes text for safe inclusion in a WhatsApp URL query parameter.
@@ -727,7 +727,7 @@ fn BackgroundMusicFab() -> Element {
                 }
                 span { class: "bgm-label-stack",
                     span { class: "bgm-kicker",
-                        "{tr(lang, \"Wedding Piano\", \"വിവാഹ സംഗീതം\")}"
+                        "{tr(lang, \"A Thousand Years\", \"വിവാഹ സംഗീതം\")}"
                     }
                     span { class: "bgm-status-text",
                         if playing {
@@ -873,7 +873,7 @@ fn HeroInvitationScene() -> Element {
                 div { class: "hero-dock hero-stagger-4",
                     div { class: "dock-date-row",
                         span { class: "dock-date-crest",
-                            {tr(lang, "SUNDAY • 24 JANUARY 2027 • 3:00 PM WEDDING & 7:00 PM RECEPTION", "ഞായർ • 24 ജനുവരി 2027 • 3:00 PM വിവാഹം & 7:00 PM വിരുന്ന്")}
+                            {tr(lang, "SUNDAY • 24 JANUARY 2027 • 3:00 PM WEDDING & 6:30 PM RECEPTION", "ഞായർ • 24 ജനുവരി 2027 • 3:00 PM വിവാഹം & 6:30 PM വിരുന്ന്")}
                         }
                     }
 
@@ -1114,7 +1114,7 @@ fn SchematicRouteMap() -> Element {
                     }
                     g { transform: "translate(750, 48)",
                         rect { x: "-74", y: "-13", width: "148", height: "24", rx: "12", fill: "#fdf2f4", stroke: "rgba(214,138,152,0.8)", "stroke-width": "1.2" }
-                        text { x: "0", y: "3", "text-anchor": "middle", fill: "#8f4252", "font-size": "10.5", "font-weight": "700", "font-family": "Nunito, sans-serif", {tr(lang, "3:00 PM → 7:00 PM (3.5 km)", "3:00 PM → 7:00 PM (3.5 കി.മീ)")} }
+                        text { x: "0", y: "3", "text-anchor": "middle", fill: "#8f4252", "font-size": "10.5", "font-weight": "700", "font-family": "Nunito, sans-serif", {tr(lang, "3:00 PM → 6:30 PM (3.5 km)", "3:00 PM → 6:30 PM (3.5 കി.മീ)")} }
                     }
 
                     /* 4 Glowing Stop Pins */
@@ -1232,7 +1232,7 @@ fn SchematicRouteMap() -> Element {
                         }
                     }
 
-                    /* 4. SECOND EVENT (7:00 PM): TMK Arena — Animated Ghibli Twilight Scene */
+                    /* 4. SECOND EVENT (6:30 PM): TMK Arena — Animated Ghibli Twilight Scene */
                     div { class: "route-node is-highlight-reception",
                         div { class: "node-venue-photo is-animated-reception",
                             img {
@@ -1245,7 +1245,7 @@ fn SchematicRouteMap() -> Element {
                             span { class: "venue-firefly-mote fm-2", "aria-hidden": "true" }
                             span { class: "venue-firefly-mote fm-3", "aria-hidden": "true" }
                             span { class: "venue-firefly-mote fm-4", "aria-hidden": "true" }
-                            span { class: "venue-time-ribbon ribbon-champagne", {tr(lang, "7:00 PM Reception", "7:00 PM വിരുന്ന്")} }
+                            span { class: "venue-time-ribbon ribbon-champagne", {tr(lang, "6:30 PM Reception", "6:30 PM വിരുന്ന്")} }
                         }
                         div { class: "node-pin-row",
                             span { class: "node-pin pin-reception", "★" }
@@ -1254,7 +1254,7 @@ fn SchematicRouteMap() -> Element {
                         h4 { "{tr(lang, RECEPTION_NAME, \"ടി.എം.കെ അരീന (TMK Arena)\")}" }
                         p { class: "node-meta", "{tr(lang, \"Vadakkencherry\", \"വടക്കഞ്ചേരി\")}" }
                         p { class: "node-desc",
-                            {tr(lang, "Gather from 7:00 PM onwards for dinner & evening celebration.", "7:00 PM മുതൽ സായാഹ്ന വിരുന്നിനും ആഘോഷങ്ങൾക്കുമായി ഒത്തുചേരാം.")}
+                            {tr(lang, "Gather from 6:30 PM onwards for dinner & evening celebration.", "6:30 PM മുതൽ സായാഹ്ന വിരുന്നിനും ആഘോഷങ്ങൾക്കുമായി ഒത്തുചേരാം.")}
                         }
                         div { class: "node-action-stack",
                             a {
@@ -1285,18 +1285,18 @@ fn SchematicRouteMap() -> Element {
             }
 
             div { class: "route-callout-bar",
-                span { class: "callout-pill", {tr(lang, "3:00 PM Church → 7:00 PM Reception", "3:00 PM വിവാഹം → 7:00 PM വിരുന്ന്")} }
+                span { class: "callout-pill", {tr(lang, "3:00 PM Church → 6:30 PM Reception", "3:00 PM വിവാഹം → 6:30 PM വിരുന്ന്")} }
                 if lang == Lang::Ml {
                     p {
                         "രണ്ട് വേദികളും തമ്മിൽ "
                         strong { "3.5 കി.മീ (5–8 മിനിറ്റ്) ദൂരം മാത്രം" }
-                        "—3:00 PM-ന് ലൂർദ് മാതാ ഫൊറോന പള്ളിയിൽ വിവാഹച്ചടങ്ങും, തുടർന്ന് 7:00 PM മുതൽ TMK അരീനയിൽ സായാഹ്ന വിരുന്നും."
+                        "—3:00 PM-ന് ലൂർദ് മാതാ ഫൊറോന പള്ളിയിൽ വിവാഹച്ചടങ്ങും, തുടർന്ന് 6:30 PM മുതൽ TMK അരീനയിൽ സായാഹ്ന വിരുന്നും."
                     }
                 } else {
                     p {
                         "Both venues are just "
                         strong { "3.5 km (5–8 minutes) apart" }
-                        "—celebrate the wedding vows at Lourde Matha Forane Church at 3:00 PM, followed by the evening reception at TMK Arena (7:00 PM onwards)."
+                        "—celebrate the wedding vows at Lourde Matha Forane Church at 3:00 PM, followed by the evening reception at TMK Arena (6:30 PM onwards)."
                     }
                 }
             }
@@ -1315,7 +1315,7 @@ fn VenueAndTravelSection() -> Element {
                     h2 { class: "section-heading", "{tr(lang, \"The Way to Vadakkencherry\", \"വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി\")}" }
                     div { class: "filigree-divider" }
                     p { class: "section-subcopy",
-                        {tr(lang, "Follow the journey from Kochi and Thrissur to the 3:00 PM Church Ceremony and 7:00 PM Reception.", "കൊച്ചിയിൽ നിന്നും തൃശ്ശൂരിൽ നിന്നും 3:00 PM പള്ളിയിലെ വിവാഹത്തിലേക്കും 7:00 PM വിരുന്നിലേക്കുമുള്ള യാത്രാ മാർഗ്ഗം.")}
+                        {tr(lang, "Follow the journey from Kochi and Thrissur to the 3:00 PM Church Ceremony and 6:30 PM Reception.", "കൊച്ചിയിൽ നിന്നും തൃശ്ശൂരിൽ നിന്നും 3:00 PM പള്ളിയിലെ വിവാഹത്തിലേക്കും 6:30 PM വിരുന്നിലേക്കുമുള്ള യാത്രാ മാർഗ്ഗം.")}
                     }
                 }
 
@@ -1480,7 +1480,7 @@ fn RsvpSection() -> Element {
             chosen.push(tr(lang, "Wedding (3:00 PM)", "വിവാഹം (3:00 PM)"));
         }
         if ev_reception() {
-            chosen.push(tr(lang, "Reception (7:00 PM)", "വിരുന്ന് (7:00 PM)"));
+            chosen.push(tr(lang, "Reception (6:30 PM)", "വിരുന്ന് (6:30 PM)"));
         }
         if chosen.is_empty() {
             tr(lang, "None selected", "ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല").to_string()
@@ -1677,7 +1677,7 @@ fn RsvpSection() -> Element {
                                         evs.push("Wedding (3:00 PM)");
                                     }
                                     if ev_reception() {
-                                        evs.push("Reception (7:00 PM)");
+                                        evs.push("Reception (6:30 PM)");
                                     }
                                     if evs.is_empty() {
                                         "None".to_string()
@@ -1940,7 +1940,7 @@ fn RsvpSection() -> Element {
                                             aria_pressed: if ev_reception() { "true" } else { "false" },
                                             onclick: move |_| ev_reception.set(!ev_reception()),
                                             span { class: "chip-check", if ev_reception() { "✓" } else { "+" } }
-                                            {tr(lang, "Reception (7:00 PM)", "വിരുന്ന് (7:00 PM)")}
+                                            {tr(lang, "Reception (6:30 PM)", "വിരുന്ന് (6:30 PM)")}
                                         }
                                     }
                                 }
