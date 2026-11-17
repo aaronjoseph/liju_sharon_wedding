@@ -1929,6 +1929,7 @@ h4 {
 
 /* Living Ghibli animations for Church & TMK Arena frames */
 .node-venue-photo.is-animated-church img {
+    object-position: center 32%;
     animation: venue-ghibli-drift 11s ease-in-out infinite alternate;
     transform-origin: center 35%;
 }
