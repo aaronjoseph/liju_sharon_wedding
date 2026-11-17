@@ -27,7 +27,8 @@ const RECEPTION_NAME: &str = "TMK Arena";
 const RECEPTION_ADDRESS: &str = "Vadakkencherry, Kerala 678683";
 const RECEPTION_MAP_URL: &str = "https://maps.app.goo.gl/6Qqgu8MbnhjLqPpQ6?g_st=iw";
 
-const WHATSAPP_NUMBER: &str = "919844348064";
+const LIJU_WHATSAPP_NUMBER: &str = "919037569110";
+const SHARON_WHATSAPP_NUMBER: &str = "919844348041";
 const GOOGLE_SHEETS_WEBHOOK_URL: &str = "https://script.google.com/macros/s/AKfycbwc5AE_05hsVLx0QKlHUwUGxtgN8wAbkuWMrQ41i7DwVnHyaZZzgzWYwPVxRtIL9KGNGg/exec";
 const MEMORY_WALL_URL: &str = "https://photos.app.goo.gl/1gW4Lzezf9qKHPKJ6";
 
@@ -365,14 +366,14 @@ const EVENTS: &[EventInfo] = &[
         numeral: "I",
         badge: "Sunday • 3:00 PM",
         badge_ml: "ഞായർ • 3:00 PM",
-        title: "Wedding at Church",
-        title_ml: "വിവാഹം — പള്ളിയിൽ",
+        title: "Wedding",
+        title_ml: "വിവാഹം",
         subtitle: "Solemn Nuptial Mass, sacred vows & joyful blessings with family",
         subtitle_ml: "തിരുവിവാഹ കുർബാന, വിശുദ്ധ പ്രതിജ്ഞകൾ & കുടുംബത്തോടൊപ്പമുള്ള പ്രാർത്ഥനാശീർവാദം",
         date: "Sunday, 24 January 2027",
         date_ml: "ഞായർ, 24 ജനുവരി 2027",
-        time: "3:00 PM IST",
-        time_ml: "ഉച്ചയ്ക്ക് ശേഷം 3:00 PM IST",
+        time: "3:00 PM",
+        time_ml: "ഉച്ചയ്ക്ക് ശേഷം 3:00 PM",
         venue_area: "Lourde Matha Forane Church, Vadakkencherry",
         venue_area_ml: "ലൂർദ് മാതാ ഫൊറോന പള്ളി, വടക്കഞ്ചേരി",
         map_url: CHURCH_MAP_URL,
@@ -382,14 +383,14 @@ const EVENTS: &[EventInfo] = &[
         numeral: "II",
         badge: "Sunday • 7:00 PM",
         badge_ml: "ഞായർ • 7:00 PM",
-        title: "Evening Reception",
-        title_ml: "സായാഹ്ന വിരുന്ന്",
+        title: "Reception",
+        title_ml: "വിരുന്ന്",
         subtitle: "Celebratory dinner, music, cake cutting & happy fellowship",
         subtitle_ml: "സ്നേഹവിരുന്ന്, സംഗീതം, കേക്ക് മുറിക്കൽ & സന്തോഷസംഗമം",
         date: "Sunday, 24 January 2027",
         date_ml: "ഞായർ, 24 ജനുവരി 2027",
-        time: "7:00 PM onwards IST",
-        time_ml: "വൈകുന്നേരം 7:00 PM മുതൽ IST",
+        time: "7:00 PM onwards",
+        time_ml: "വൈകുന്നേരം 7:00 PM മുതൽ",
         venue_area: "TMK Arena, Vadakkencherry",
         venue_area_ml: "TMK അരീന, വടക്കഞ്ചേരി",
         map_url: RECEPTION_MAP_URL,
@@ -877,7 +878,7 @@ fn EventsSection() -> Element {
                     h2 { class: "section-heading", "{tr(lang, \"The Wedding Day\", \"വിവാഹ ദിനം\")}" }
                     div { class: "filigree-divider" }
                     p { class: "section-subcopy",
-                        "{tr(lang, \"Join Liju & Sharon on Sunday, 24 January 2027 in Vadakkencherry for the Holy Matrimony followed by the Evening Reception.\", \"2027 ജനുവരി 24 ഞായറാഴ്ച വടക്കഞ്ചേരിയിൽ നടക്കുന്ന തിരുവിവാഹത്തിലും തുടർന്നുള്ള സായാഹ്ന വിരുന്നിലും ലിജുവിനോടും ഷാരോണിനോടുമൊപ്പം പങ്കുചേരൂ.\")}"
+                        "{tr(lang, \"Join Liju & Sharon on Sunday, 24 January 2027 in Vadakkencherry for the Holy Matrimony followed by the Reception.\", \"2027 ജനുവരി 24 ഞായറാഴ്ച വടക്കഞ്ചേരിയിൽ നടക്കുന്ന തിരുവിവാഹത്തിലും തുടർന്നുള്ള വിരുന്നിലും ലിജുവിനോടും ഷാരോണിനോടുമൊപ്പം പങ്കുചേരൂ.\")}"
                     }
                 }
 
@@ -1116,7 +1117,7 @@ fn SchematicRouteMap() -> Element {
                         }
                         span { class: "node-kicker", "{tr(lang, \"Airport & Metro Hub\", \"എയർപോർട്ട് & മെട്രോ ഹബ്\")}" }
                         h4 { "{tr(lang, \"Kochi (COK)\", \"കൊച്ചി (COK)\")}" }
-                        p { class: "node-meta", "{tr(lang, \"75 km • 1 hr 20 mins drive\", \"75 കി.മീ • 1 മണിക്കൂർ 20 മിനിറ്റ്\")}" }
+                        p { class: "node-meta", "{tr(lang, \"~80 km to TMK Arena • ~1 hr 30 mins\", \"TMK അരീനയിലേക്ക് ~80 കി.മീ • ~1.5 മണിക്കൂർ\")}" }
                         p { class: "node-desc",
                             "{tr(lang, \"Arrive at Cochin Airport or Ernakulam and head towards Thrissur and Vadakkencherry.\", \"കൊച്ചി എയർപോർട്ടിലോ എറണാകുളത്തോ എത്തി തൃശ്ശൂർ വഴി വടക്കഞ്ചേരിയിലേക്ക് യാത്ര തിരിക്കാം.\")}"
                         }
@@ -1131,17 +1132,17 @@ fn SchematicRouteMap() -> Element {
                                 decoding: "async",
                             }
                             div { class: "ghibli-shimmer-veil", "aria-hidden": "true" }
-                            span { class: "venue-time-ribbon ribbon-champagne", "{tr(lang, \"Stay Hub • TCR\", \"താമസ കേന്ദ്രം • TCR\")}" }
+                            span { class: "venue-time-ribbon ribbon-champagne", "{tr(lang, \"Stay Hub\", \"താമസ കേന്ദ്രം\")}" }
                         }
                         div { class: "node-pin-row",
                             span { class: "node-pin pin-stay", "⌂" }
-                            span { class: "node-leg-pill", "{tr(lang, \"Step 02 • 45 km\", \"ഘട്ടം 02 • 45 കി.മീ\")}" }
+                            span { class: "node-leg-pill", "{tr(lang, \"Step 02 • Stay Hub\", \"ഘട്ടം 02 • താമസ കേന്ദ്രം\")}" }
                         }
-                        span { class: "node-kicker", "{tr(lang, \"Stay & Rail Hub (TCR)\", \"താമസം & റെയിൽ ഹബ് (TCR)\")}" }
+                        span { class: "node-kicker", "{tr(lang, \"Stay & Rail Hub\", \"താമസം & റെയിൽ ഹബ്\")}" }
                         h4 { "{tr(lang, \"Thrissur\", \"തൃശ്ശൂർ\")}" }
-                        p { class: "node-meta", "{tr(lang, \"30 km to venues • 35 mins\", \"വേദികളിലേക്ക് 30 കി.മീ • 35 മിനിറ്റ്\")}" }
+                        p { class: "node-meta", "{tr(lang, \"~32 km to TMK Arena • ~35 mins\", \"TMK അരീനയിലേക്ക് ~32 കി.മീ • ~35 മിനിറ്റ്\")}" }
                         p { class: "node-desc",
-                            "{tr(lang, \"Ideal base for Airbnbs & family hotels, 35 minutes from Vadakkencherry.\", \"വടക്കഞ്ചേരിയിൽ നിന്ന് 35 മിനിറ്റ് അകലെ എയർബിഎൻബികൾക്കും ഹോട്ടലുകൾക്കും ഏറ്റവും അനുയോജ്യമായ സ്ഥലം.\")}"
+                            "{tr(lang, \"Ideal base for Airbnbs & family hotels, ~35 minutes from TMK Arena.\", \"TMK അരീനയിൽ നിന്ന് ~35 മിനിറ്റ് അകലെ എയർബിഎൻബികൾക്കും ഹോട്ടലുകൾക്കും ഏറ്റവും അനുയോജ്യമായ സ്ഥലം.\")}"
                         }
                     }
 
@@ -1164,7 +1165,7 @@ fn SchematicRouteMap() -> Element {
                             span { class: "node-leg-pill pill-rose", "{tr(lang, \"Ceremony Venue\", \"വിവാഹ വേദി\")}" }
                         }
                         h4 { "{tr(lang, CHURCH_NAME, \"ലൂർദ് മാതാ ഫൊറോന പള്ളി\")}" }
-                        p { class: "node-meta", "{tr(lang, \"Vadakkencherry\", \"വടക്കഞ്ചേരി\")}" }
+                        p { class: "node-meta", "{tr(lang, \"Vadakkencherry • 3.5 km to TMK Arena\", \"വടക്കഞ്ചേരി • TMK അരീനയിലേക്ക് 3.5 കി.മീ\")}" }
                         p { class: "node-desc",
                             {tr(lang, "Join us at 3:00 PM for the Solemn Nuptial Mass & wedding vows.", "3:00 PM-ന് തിരുവിവാഹ കുർബാനയിലും പ്രതിജ്ഞാ ചടങ്ങിലും പങ്കുചേരാം.")}
                         }
@@ -1277,7 +1278,7 @@ fn VenueAndTravelSection() -> Element {
                     h2 { class: "section-heading", "{tr(lang, \"The Way to Vadakkencherry\", \"വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി\")}" }
                     div { class: "filigree-divider" }
                     p { class: "section-subcopy",
-                        {tr(lang, "Follow the journey from Kochi and Thrissur to the 3:00 PM Church Ceremony and 7:00 PM Evening Reception.", "കൊച്ചിയിൽ നിന്നും തൃശ്ശൂരിൽ നിന്നും 3:00 PM പള്ളിയിലെ വിവാഹത്തിലേക്കും 7:00 PM വിരുന്നിലേക്കുമുള്ള യാത്രാ മാർഗ്ഗം.")}
+                        {tr(lang, "Follow the journey from Kochi and Thrissur to the 3:00 PM Church Ceremony and 7:00 PM Reception.", "കൊച്ചിയിൽ നിന്നും തൃശ്ശൂരിൽ നിന്നും 3:00 PM പള്ളിയിലെ വിവാഹത്തിലേക്കും 7:00 PM വിരുന്നിലേക്കുമുള്ള യാത്രാ മാർഗ്ഗം.")}
                     }
                 }
 
@@ -1439,18 +1440,10 @@ fn RsvpSection() -> Element {
     let selected_events = {
         let mut chosen = Vec::new();
         if ev_church() {
-            chosen.push(tr(
-                lang,
-                "Wedding at Church (3:00 PM)",
-                "പള്ളിയിലെ വിവാഹം (3:00 PM)",
-            ));
+            chosen.push(tr(lang, "Wedding (3:00 PM)", "വിവാഹം (3:00 PM)"));
         }
         if ev_reception() {
-            chosen.push(tr(
-                lang,
-                "Evening Reception (7:00 PM)",
-                "സായാഹ്ന വിരുന്ന് (7:00 PM)",
-            ));
+            chosen.push(tr(lang, "Reception (7:00 PM)", "വിരുന്ന് (7:00 PM)"));
         }
         if chosen.is_empty() {
             tr(lang, "None selected", "ഒന്നും തിരഞ്ഞെടുത്തിട്ടില്ല").to_string()
@@ -1503,8 +1496,12 @@ fn RsvpSection() -> Element {
         )
     };
 
+    let whatsapp_number = match family_side() {
+        Some(FamilySide::Bride) => SHARON_WHATSAPP_NUMBER,
+        _ => LIJU_WHATSAPP_NUMBER,
+    };
     let whatsapp_url = format!(
-        "https://wa.me/{WHATSAPP_NUMBER}?text={}",
+        "https://wa.me/{whatsapp_number}?text={}",
         percent_encode(&summary_text)
     );
 
@@ -1640,10 +1637,10 @@ fn RsvpSection() -> Element {
                                 let events_en = if is_attending() {
                                     let mut evs = Vec::new();
                                     if ev_church() {
-                                        evs.push("Wedding at Church (3:00 PM)");
+                                        evs.push("Wedding (3:00 PM)");
                                     }
                                     if ev_reception() {
-                                        evs.push("Evening Reception (7:00 PM)");
+                                        evs.push("Reception (7:00 PM)");
                                     }
                                     if evs.is_empty() {
                                         "None".to_string()
@@ -1898,7 +1895,7 @@ fn RsvpSection() -> Element {
                                             aria_pressed: if ev_church() { "true" } else { "false" },
                                             onclick: move |_| ev_church.set(!ev_church()),
                                             span { class: "chip-check", if ev_church() { "✓" } else { "+" } }
-                                            {tr(lang, "Wedding at Church (3:00 PM)", "പള്ളിയിലെ വിവാഹം (3:00 PM)")}
+                                            {tr(lang, "Wedding (3:00 PM)", "വിവാഹം (3:00 PM)")}
                                         }
                                         button {
                                             r#type: "button",
@@ -1906,7 +1903,7 @@ fn RsvpSection() -> Element {
                                             aria_pressed: if ev_reception() { "true" } else { "false" },
                                             onclick: move |_| ev_reception.set(!ev_reception()),
                                             span { class: "chip-check", if ev_reception() { "✓" } else { "+" } }
-                                            {tr(lang, "Evening Reception (7:00 PM)", "സായാഹ്ന വിരുന്ന് (7:00 PM)")}
+                                            {tr(lang, "Reception (7:00 PM)", "വിരുന്ന് (7:00 PM)")}
                                         }
                                     }
                                 }
