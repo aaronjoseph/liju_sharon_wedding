@@ -1028,7 +1028,7 @@ fn AttireSection() -> Element {
                             div { class: "lookbook-style-pills",
                                 span { class: "lookbook-pill is-rose", "{tr(lang, \"Salwar Suits\", \"സൽവാർ സ്യൂട്ട്\")}" }
                                 span { class: "lookbook-pill is-rose", "{tr(lang, \"Pastel Sarees\", \"പേസ്റ്റൽ സാരികൾ\")}" }
-                                span { class: "lookbook-pill is-rose", "{tr(lang, \"Anarkali / Churidar\", \"അനാർക്കലി / ചുരിദാർ\")}" }
+                                span { class: "lookbook-pill is-rose", "{tr(lang, \"Lehenga\", \"ലെഹംഗ\")}" }
                             }
                         }
                     }
