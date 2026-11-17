@@ -1406,7 +1406,7 @@ fn VenueAndTravelSection() -> Element {
                                 ul { class: "friendly-list",
                                     li {
                                         strong { "Door-to-Door Ease: " }
-                                        "Smoothly travel from your Airbnb/hotel to Lourde Matha Forane Church and onto TMK Arena."
+                                        "Smoothly travel from your Airbnb/hotel to Lourde Matha Forane Church and onward to TMK Arena."
                                     }
                                     li {
                                         strong { "Between Venues: " }
