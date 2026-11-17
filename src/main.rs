@@ -204,22 +204,58 @@ const ENHANCE_SCRIPT: &str = r##"
     const bgmAudio = document.getElementById("wedding-bgm");
     if (bgmBtn && bgmAudio && !bgmBtn.__slBound) {
         bgmBtn.__slBound = true;
-        const warmPreload = () => {
-            if (bgmAudio.preload === "none") {
-                bgmAudio.preload = "auto";
+        let userStopped = false;
+        bgmAudio.volume = 0.55;
+
+        const tryStartBgm = () => {
+            if (userStopped || !bgmAudio.paused) return Promise.resolve(true);
+            bgmAudio.volume = 0.55;
+            const p = bgmAudio.play();
+            if (p && typeof p.then === "function") {
+                return p.then(() => true).catch(() => false);
             }
+            return Promise.resolve(!bgmAudio.paused);
         };
-        bgmBtn.addEventListener("mouseenter", warmPreload, { passive: true, once: true });
-        bgmBtn.addEventListener("touchstart", warmPreload, { passive: true, once: true });
+
+        const unlockOnGesture = (evt) => {
+            if (userStopped) {
+                cleanupUnlock();
+                return;
+            }
+            if (evt && evt.target && bgmBtn.contains(evt.target)) {
+                return;
+            }
+            tryStartBgm().then((ok) => {
+                if (ok) cleanupUnlock();
+            });
+        };
+
+        const cleanupUnlock = () => {
+            window.removeEventListener("pointerdown", unlockOnGesture, true);
+            window.removeEventListener("touchstart", unlockOnGesture, true);
+            window.removeEventListener("keydown", unlockOnGesture, true);
+        };
+
+        // Attempt immediate autoplay; if browser blocks unmuted autoplay, unlock on first gesture anywhere
+        tryStartBgm().then((ok) => {
+            if (!ok && !userStopped) {
+                window.addEventListener("pointerdown", unlockOnGesture, { capture: true, passive: true });
+                window.addEventListener("touchstart", unlockOnGesture, { capture: true, passive: true });
+                window.addEventListener("keydown", unlockOnGesture, { capture: true, passive: true });
+            }
+        });
+
         bgmBtn.addEventListener("click", () => {
             if (bgmAudio.paused) {
-                bgmAudio.volume = 0.6;
-                const playPromise = bgmAudio.play();
-                if (playPromise && typeof playPromise.catch === "function") {
-                    playPromise.catch(() => {});
-                }
+                userStopped = false;
+                tryStartBgm().then((ok) => {
+                    if (ok) cleanupUnlock();
+                });
             } else {
+                userStopped = true;
+                cleanupUnlock();
                 bgmAudio.pause();
+                bgmAudio.currentTime = 0;
             }
         });
     }
@@ -657,8 +693,9 @@ fn BackgroundMusicFab() -> Element {
             audio {
                 id: "wedding-bgm",
                 src: MALAYALAM_WEDDING_BGM,
+                autoplay: true,
                 r#loop: true,
-                preload: "none",
+                preload: "auto",
                 onplay: move |_| is_playing.set(true),
                 onpause: move |_| is_playing.set(false),
                 onended: move |_| is_playing.set(false),
@@ -673,9 +710,9 @@ fn BackgroundMusicFab() -> Element {
                 },
                 aria_pressed: if playing { "true" } else { "false" },
                 aria_label: if playing {
-                    tr(lang, "Pause Malayalam wedding music", "മലയാളം വിവാഹ ഗാനം നിർത്തുക")
+                    tr(lang, "Stop instrumental wedding music", "വിവാഹ സംഗീതം നിർത്തുക")
                 } else {
-                    tr(lang, "Play Malayalam wedding music", "മലയാളം വിവാഹ ഗാനം കേൾക്കാം")
+                    tr(lang, "Play instrumental wedding music", "വിവാഹ സംഗീതം കേൾക്കാം")
                 },
                 span { class: "bgm-disc", "aria-hidden": "true",
                     if playing {
@@ -690,13 +727,13 @@ fn BackgroundMusicFab() -> Element {
                 }
                 span { class: "bgm-label-stack",
                     span { class: "bgm-kicker",
-                        "{tr(lang, \"Malayalam Hymn\", \"വിവാഹ ഗാനം\")}"
+                        "{tr(lang, \"Wedding Piano\", \"വിവാഹ സംഗീതം\")}"
                     }
                     span { class: "bgm-status-text",
                         if playing {
-                            "{tr(lang, \"Pause Music\", \"നിർത്തുക\")}"
+                            "{tr(lang, \"Stop Music\", \"നിർത്തുക\")}"
                         } else {
-                            "{tr(lang, \"Play Music\", \"ഗാനം കേൾക്കാം\")}"
+                            "{tr(lang, \"Play Music\", \"സംഗീതം കേൾക്കാം\")}"
                         }
                     }
                 }
