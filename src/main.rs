@@ -17,6 +17,7 @@ const RSVP_SHARON_FOUNTAIN: Asset = asset!("/assets/rsvp_sharon_fountain.jpg");
 
 const WEDDING_ICS: Asset = asset!("/assets/liju_sharon_wedding.ics");
 const RECEPTION_ICS: Asset = asset!("/assets/liju_sharon_reception.ics");
+const MALAYALAM_WEDDING_BGM: Asset = asset!("/assets/malayalam_wedding_bgm.mp3");
 
 const CHURCH_NAME: &str = "Lourde Matha Forane Church";
 const CHURCH_ADDRESS: &str = "Vadakkencherry, Kerala 678683";
@@ -62,7 +63,6 @@ const ENHANCE_SCRIPT: &str = r##"
         { id: "palette", en: "What to Wear", ml: "വസ്ത്രധാരണം" },
         { id: "venue", en: "Visual Route", ml: "യാത്രാ മാർഗ്ഗം" },
         { id: "stay-travel", en: "Where to Stay", ml: "താമസ സൗകര്യങ്ങൾ" },
-        { id: "journey-planner", en: "Journey Planner", ml: "യാത്രാ പ്ലാനർ" },
         { id: "rsvp", en: "RSVP & Arrival", ml: "RSVP & വരവ്" },
         { id: "memories", en: "Memory Wall", ml: "ഓർമ്മകളുടെ ചുവർ" },
     ];
@@ -198,6 +198,30 @@ const ENHANCE_SCRIPT: &str = r##"
     }
     tickCountdown();
     window.__slCountdownInterval = setInterval(tickCountdown, 60000);
+
+    const bgmBtn = document.getElementById("bgm-toggle-btn");
+    const bgmAudio = document.getElementById("wedding-bgm");
+    if (bgmBtn && bgmAudio && !bgmBtn.__slBound) {
+        bgmBtn.__slBound = true;
+        const warmPreload = () => {
+            if (bgmAudio.preload === "none") {
+                bgmAudio.preload = "auto";
+            }
+        };
+        bgmBtn.addEventListener("mouseenter", warmPreload, { passive: true, once: true });
+        bgmBtn.addEventListener("touchstart", warmPreload, { passive: true, once: true });
+        bgmBtn.addEventListener("click", () => {
+            if (bgmAudio.paused) {
+                bgmAudio.volume = 0.6;
+                const playPromise = bgmAudio.play();
+                if (playPromise && typeof playPromise.catch === "function") {
+                    playPromise.catch(() => {});
+                }
+            } else {
+                bgmAudio.pause();
+            }
+        });
+    }
 
     function waitForMainStylesheet() {
         return new Promise((resolve) => {
@@ -528,6 +552,7 @@ fn App() -> Element {
         document::Stylesheet { href: MAIN_CSS }
 
         Navbar {}
+        BackgroundMusicFab {}
         main { class: if current_lang == Lang::Ml { "page-shell lang-ml" } else { "page-shell" },
             HeroInvitationScene {}
             EventsSection {}
@@ -607,13 +632,71 @@ fn Navbar() -> Element {
                     a { href: "#palette", onclick: move |_| menu_open.set(false), "{tr(current, \"What to Wear\", \"വസ്ത്രധാരണം\")}" }
                     a { href: "#venue", onclick: move |_| menu_open.set(false), "{tr(current, \"Visual Route\", \"യാത്രാ മാർഗ്ഗം\")}" }
                     a { href: "#stay-travel", onclick: move |_| menu_open.set(false), "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}" }
-                    a { href: "#journey-planner", onclick: move |_| menu_open.set(false), "{tr(current, \"Journey Planner\", \"യാത്രാ പ്ലാനർ\")}" }
                     a { href: "#memories", onclick: move |_| menu_open.set(false), "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}" }
                     a {
                         href: "#rsvp",
                         class: "popover-rsvp-link",
                         onclick: move |_| menu_open.set(false),
                         "{tr(current, \"RSVP & Arrival →\", \"RSVP & വരവ് →\")}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn BackgroundMusicFab() -> Element {
+    let lang = use_context::<Signal<Lang>>()();
+    let mut is_playing = use_signal(|| false);
+    let playing = is_playing();
+
+    rsx! {
+        div { class: "bgm-dock",
+            audio {
+                id: "wedding-bgm",
+                src: MALAYALAM_WEDDING_BGM,
+                r#loop: true,
+                preload: "none",
+                onplay: move |_| is_playing.set(true),
+                onpause: move |_| is_playing.set(false),
+                onended: move |_| is_playing.set(false),
+            }
+            button {
+                id: "bgm-toggle-btn",
+                r#type: "button",
+                class: if playing {
+                    "bgm-floating-pill is-playing"
+                } else {
+                    "bgm-floating-pill"
+                },
+                aria_pressed: if playing { "true" } else { "false" },
+                aria_label: if playing {
+                    tr(lang, "Pause Malayalam wedding music", "മലയാളം വിവാഹ ഗാനം നിർത്തുക")
+                } else {
+                    tr(lang, "Play Malayalam wedding music", "മലയാളം വിവാഹ ഗാനം കേൾക്കാം")
+                },
+                span { class: "bgm-disc", "aria-hidden": "true",
+                    if playing {
+                        span { class: "bgm-eq",
+                            span { class: "bgm-eq-bar b-1" }
+                            span { class: "bgm-eq-bar b-2" }
+                            span { class: "bgm-eq-bar b-3" }
+                        }
+                    } else {
+                        span { class: "bgm-note-glyph", "♪" }
+                    }
+                }
+                span { class: "bgm-label-stack",
+                    span { class: "bgm-kicker",
+                        "{tr(lang, \"Malayalam Hymn\", \"വിവാഹ ഗാനം\")}"
+                    }
+                    span { class: "bgm-status-text",
+                        if playing {
+                            "{tr(lang, \"Pause Music\", \"നിർത്തുക\")}"
+                        } else {
+                            "{tr(lang, \"Play Music\", \"ഗാനം കേൾക്കാം\")}"
+                        }
                     }
                 }
             }
@@ -1301,961 +1384,6 @@ fn VenueAndTravelSection() -> Element {
                     }
                 }
 
-                SmartJourneyPlanner {}
-            }
-        }
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum PlannerPhase {
-    Arrival,
-    Exit,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ArrivalChannel {
-    FlightKochi,
-    TrainHubs,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum FlightPath {
-    ViaThrissurStay,
-    DirectToChurch,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum TrainGateway {
-    Palakkad,
-    Kochi,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ExitOrigin {
-    TmkArena,
-    Church,
-    ThrissurStay,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ExitTarget {
-    KochiAirport,
-    PalakkadStation,
-    ThrissurKochiRail,
-}
-
-#[component]
-fn SmartJourneyPlanner() -> Element {
-    let lang = use_context::<Signal<Lang>>()();
-    let mut phase = use_signal(|| PlannerPhase::Arrival);
-    let mut arrival_channel = use_signal(|| ArrivalChannel::FlightKochi);
-    let mut flight_path = use_signal(|| FlightPath::ViaThrissurStay);
-    let mut train_gateway = use_signal(|| TrainGateway::Palakkad);
-    let mut exit_origin = use_signal(|| ExitOrigin::TmkArena);
-    let mut exit_target = use_signal(|| ExitTarget::KochiAirport);
-
-    let origin_query = match exit_origin() {
-        ExitOrigin::TmkArena => "TMK+Arena,+Vadakkencherry,+Kerala+678683",
-        ExitOrigin::Church => "Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683",
-        ExitOrigin::ThrissurStay => "Thrissur,+Kerala",
-    };
-
-    let target_query = match exit_target() {
-        ExitTarget::KochiAirport => "Cochin+International+Airport,+Kochi,+Kerala",
-        ExitTarget::PalakkadStation => "Palakkad+Junction+Railway+Station,+Palakkad,+Kerala",
-        ExitTarget::ThrissurKochiRail => "Thrissur+Railway+Station,+Thrissur,+Kerala",
-    };
-
-    let exit_drive_url = format!(
-        "https://www.google.com/maps/dir/?api=1&origin={origin_query}&destination={target_query}&travelmode=driving"
-    );
-    let exit_transit_url = format!(
-        "https://www.google.com/maps/dir/?api=1&origin={origin_query}&destination={target_query}&travelmode=transit"
-    );
-
-    let origin_short = match exit_origin() {
-        ExitOrigin::TmkArena => tr(lang, "TMK Arena (Reception)", "TMK അരീന (വിരുന്ന് വേദി)"),
-        ExitOrigin::Church => tr(lang, "Lourde Matha Church", "ലൂർദ് മാതാ പള്ളി"),
-        ExitOrigin::ThrissurStay => tr(lang, "Thrissur Hotels", "തൃശ്ശൂർ ഹോട്ടലുകൾ"),
-    };
-
-    let target_short = match exit_target() {
-        ExitTarget::KochiAirport => tr(lang, "Cochin Airport (COK)", "കൊച്ചി എയർപോർട്ട് (COK)"),
-        ExitTarget::PalakkadStation => tr(lang, "Palakkad Jn (PGT)", "പാലക്കാട് ജംഗ്ഷൻ (PGT)"),
-        ExitTarget::ThrissurKochiRail => tr(
-            lang,
-            "Thrissur (TCR) / Kochi (ERS)",
-            "തൃശ്ശൂർ (TCR) / കൊച്ചി (ERS)",
-        ),
-    };
-
-    let (exit_distance, exit_heading, exit_opt_primary, exit_opt_secondary, exit_tip) =
-        match (exit_origin(), exit_target()) {
-            (ExitOrigin::TmkArena, ExitTarget::KochiAirport) => (
-                tr(lang, "72 km • 1 hr 20 mins", "72 കി.മീ • 1 മണിക്കൂർ 20 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Reception (TMK Arena) → Cochin International Airport (COK)",
-                    "TMK അരീന (വിരുന്ന്) → കൊച്ചി അന്താരാഷ്ട്ര വിമാനത്താവളം (COK)",
-                ),
-                tr(
-                    lang,
-                    "Uber / Pre-booked Cab / Rental Drop-off: Direct 1 hr 20 min drive via Thrissur right to the COK Departure Terminal.",
-                    "ഊബർ / മുൻകൂട്ടി ബുക്ക് ചെയ്ത ക്യാബ് / റെന്റൽ കാർ: തൃശ്ശൂർ വഴി 1 മണിക്കൂർ 20 മിനിറ്റിൽ നേരിട്ട് COK ടെർമിനലിൽ എത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Via Thrissur Rail + Feeder: 40-min cab to Thrissur (TCR), express train to Aluva (AWY), and a 20-min airport feeder cab.",
-                    "തൃശ്ശൂർ വഴി ട്രെയിൻ: 40 മിനിറ്റിൽ തൃശ്ശൂർ (TCR), അവിടെ നിന്ന് ആലുവയിലേക്ക് (AWY) ട്രെയിൻ + 20 മിനിറ്റ് എയർപോർട്ട് ക്യാബ്.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Pre-book your return cab before 8:30 PM and leave 3.5–4 hours ahead of domestic flights (4.5–5 hours for international).",
-                    "സൂചന: രാത്രി മടങ്ങുന്നവർ 8:30 PM-ന് മുൻപ് ക്യാബ് ബുക്ക് ചെയ്യുക; ഫ്ലൈറ്റിന് 3.5–4 മണിക്കൂർ മുൻപെങ്കിലും തിരിക്കുക.",
-                ),
-            ),
-            (ExitOrigin::Church, ExitTarget::KochiAirport) => (
-                tr(lang, "75 km • 1 hr 25 mins", "75 കി.മീ • 1 മണിക്കൂർ 25 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Lourde Matha Forane Church → Cochin International Airport (COK)",
-                    "ലൂർദ് മാതാ ഫൊറോന പള്ളി → കൊച്ചി വിമാനത്താവളം (COK)",
-                ),
-                tr(
-                    lang,
-                    "Direct Uber / Local Cab / Car Rental: Smooth 1 hr 25 min drive from Vadakkencherry via Thrissur to COK Airport.",
-                    "നേരിട്ടുള്ള ഊബർ / ക്യാബ് / റെന്റൽ കാർ: വടക്കഞ്ചേരിയിൽ നിന്ന് തൃശ്ശൂർ വഴി 1 മണിക്കൂർ 25 മിനിറ്റിൽ കൊച്ചി എയർപോർട്ടിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Bus / Train Option: KSRTC bus or cab to Thrissur (35 mins), then low-floor airport AC bus or train to Aluva (AWY).",
-                    "ബസ് / ട്രെയിൻ മാർഗ്ഗം: 35 മിനിറ്റിൽ തൃശ്ശൂർ എത്തി, അവിടെ നിന്ന് എയർപോർട്ട് എസി ബസോ ആലുവയിലേക്കുള്ള ട്രെയിനോ തിരഞ്ഞെടുക്കാം.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Allow 3.5–4 hours total buffer before flight departure time.",
-                    "സൂചന: ഫ്ലൈറ്റ് സമയത്തിന് 3.5–4 മണിക്കൂർ മുൻപായി യാത്ര തിരിക്കുന്നതാണ് ഉചിതം.",
-                ),
-            ),
-            (ExitOrigin::ThrissurStay, ExitTarget::KochiAirport) => (
-                tr(lang, "52 km • 1 hr 10 mins", "52 കി.മീ • 1 മണിക്കൂർ 10 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Thrissur Hotels & Airbnbs → Cochin International Airport (COK)",
-                    "തൃശ്ശൂർ ഹോട്ടലുകൾ / എയർബിഎൻബി → കൊച്ചി വിമാനത്താവളം (COK)",
-                ),
-                tr(
-                    lang,
-                    "Morning Uber / Hotel Taxi: Easy 1 hr 10 min ride directly from your Thrissur stay to COK Departures.",
-                    "ഊബർ / ഹോട്ടൽ ടാക്സി: തൃശ്ശൂരിലെ താമസസ്ഥലത്തുനിന്ന് 1 മണിക്കൂർ 10 മിനിറ്റിൽ നേരിട്ട് എയർപോർട്ടിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Train to Aluva (AWY) + Feeder: 45-min train from Thrissur (TCR) to Aluva, followed by a 20-min airport feeder bus or cab.",
-                    "ആലുവ വഴി ട്രെയിൻ: തൃശ്ശൂരിൽ (TCR) നിന്ന് ആലുവയിലേക്ക് (AWY) 45 മിനിറ്റ് ട്രെയിൻ + 20 മിനിറ്റ് എയർപോർട്ട് ഫീഡർ ക്യാബ്/ബസ്.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Checking out Monday morning (Jan 25) makes for a relaxed 70-minute airport transfer.",
-                    "സൂചന: തിങ്കളാഴ്ച രാവിലെ (ജനുവരി 25) ചെക്ക്-ഔട്ട് ചെയ്ത് സൗകര്യപ്രദമായി എയർപോർട്ടിലേക്ക് മടങ്ങാം.",
-                ),
-            ),
-            (ExitOrigin::TmkArena, ExitTarget::PalakkadStation) => (
-                tr(lang, "33 km • 38–45 mins", "33 കി.മീ • 38–45 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Reception (TMK Arena) → Palakkad Junction Railway Station (PGT)",
-                    "TMK അരീന (വിരുന്ന്) → പാലക്കാട് ജംഗ്ഷൻ റെയിൽവേ സ്റ്റേഷൻ (PGT)",
-                ),
-                tr(
-                    lang,
-                    "Direct Uber / Pre-booked Cab: Quick 40-minute eastbound ride right to Palakkad Junction (PGT) platform entrance.",
-                    "നേരിട്ടുള്ള ഊബർ / ക്യാബ്: വിരുന്ന് കഴിഞ്ഞ് 40 മിനിറ്റിനുള്ളിൽ നേരിട്ട് പാലക്കാട് ജംഗ്ഷൻ (PGT) സ്റ്റേഷനിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "KSRTC / Fast Bus: Frequent buses from Vadakkencherry to Palakkad Stand, followed by a 10-min auto/cab to PGT.",
-                    "കെ.എസ്.ആർ.ടി.സി / ഫാസ്റ്റ് ബസ്: വടക്കഞ്ചേരിയിൽ നിന്ന് പാലക്കാട്ടേക്ക് തുടർച്ചയായി ബസ് സൗകര്യം ലഭ്യമാണ്.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Ideal for catching late-night overnight express trains towards Bengaluru, Chennai & Coimbatore.",
-                    "സൂചന: ബെംഗളൂരു, ചെന്നൈ, കോയമ്പത്തൂർ ഭാഗത്തേക്കുള്ള രാത്രികാല ട്രെയിനുകൾ പിടിക്കാൻ ഏറ്റവും സൗകര്യപ്രദം.",
-                ),
-            ),
-            (ExitOrigin::Church, ExitTarget::PalakkadStation) => (
-                tr(lang, "35 km • 40–45 mins", "35 കി.മീ • 40–45 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Lourde Matha Forane Church → Palakkad Junction (PGT)",
-                    "ലൂർദ് മാതാ ഫൊറോന പള്ളി → പാലക്കാട് ജംഗ്ഷൻ (PGT)",
-                ),
-                tr(
-                    lang,
-                    "Direct Cab / Uber / Rental: 40–45 minutes directly from the church in Vadakkencherry to Palakkad Junction (PGT).",
-                    "നേരിട്ടുള്ള ക്യാബ് / ഊബർ: വടക്കഞ്ചേരി പള്ളിയിൽ നിന്ന് 40–45 മിനിറ്റിൽ പാലക്കാട് ജംഗ്ഷനിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Direct Bus: Board any Palakkad-bound KSRTC or fast bus at Vadakkencherry (5 mins from the church).",
-                    "ബസ് മാർഗ്ഗം: വടക്കഞ്ചേരിയിൽ നിന്ന് പാലക്കാട്ടേക്കുള്ള നേരിട്ടുള്ള ബസുകളിൽ വേഗത്തിൽ എത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Keep a 75-minute buffer before your train's scheduled departure at PGT.",
-                    "സൂചന: ട്രെയിൻ പുറപ്പെടുന്നതിന് 75 മിനിറ്റ് മുൻപെങ്കിലും വടക്കഞ്ചേരിയിൽ നിന്ന് തിരിക്കുക.",
-                ),
-            ),
-            (ExitOrigin::ThrissurStay, ExitTarget::PalakkadStation) => (
-                tr(lang, "65 km • 1 hr 10–15 mins", "65 കി.മീ • 1 മണിക്കൂർ 10–15 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Thrissur Hotels → Palakkad Junction Railway Station (PGT)",
-                    "തൃശ്ശൂർ ഹോട്ടലുകൾ → പാലക്കാട് ജംഗ്ഷൻ റെയിൽവേ സ്റ്റേഷൻ (PGT)",
-                ),
-                tr(
-                    lang,
-                    "Direct Train (TCR → PGT): Hop a 1 hr 05 min express train from Thrissur Station straight into Palakkad Junction.",
-                    "നേരിട്ടുള്ള ട്രെയിൻ (TCR → PGT): തൃശ്ശൂർ സ്റ്റേഷനിൽ നിന്ന് 1 മണിക്കൂർ 05 മിനിറ്റിൽ ട്രെയിൻ വഴി പാലക്കാട് എത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Direct Cab / Uber: 1 hr 15 min drive from your Thrissur stay to Palakkad Junction (PGT).",
-                    "നേരിട്ടുള്ള ക്യാബ് / ഊബർ: തൃശ്ശൂരിൽ നിന്ന് 1 മണിക്കൂർ 15 മിനിറ്റ് ഡ്രൈവ് ചെയ്ത് പാലക്കാട് ജംഗ്ഷനിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Check if your return train also boards directly at Thrissur (TCR) to save the extra transfer!",
-                    "സൂചന: നിങ്ങളുടെ മടക്ക ട്രെയിനിന് തൃശ്ശൂരിൽ (TCR) സ്റ്റോപ്പുണ്ടോ എന്ന് പരിശോധിക്കുന്നത് സമയം ലാഭിക്കാൻ സഹായിക്കും.",
-                ),
-            ),
-            (ExitOrigin::TmkArena, ExitTarget::ThrissurKochiRail) => (
-                tr(lang, "32 km to TCR • 85 km to Kochi", "തൃശ്ശൂർ 32 കി.മീ • കൊച്ചി 85 കി.മീ"),
-                tr(
-                    lang,
-                    "Reception (TMK Arena) → Thrissur Station (TCR) & Kochi (ERS)",
-                    "TMK അരീന (വിരുന്ന്) → തൃശ്ശൂർ സ്റ്റേഷൻ (TCR) & കൊച്ചി (ERS)",
-                ),
-                tr(
-                    lang,
-                    "Cab / Uber to Thrissur (TCR): 40-minute ride to Thrissur Railway Station or back to your Thrissur hotel/Airbnb.",
-                    "തൃശ്ശൂരിലേക്ക് ക്യാബ് / ഊബർ: 40 മിനിറ്റിൽ തൃശ്ശൂർ റെയിൽവേ സ്റ്റേഷനിലോ ഹോട്ടലിലോ തിരിച്ചെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Onward Train to Kochi (ERS / ERN): Frequent 1 hr 15 min trains connect Thrissur (TCR) south to Ernakulam & Trivandrum.",
-                    "കൊച്ചിയിലേക്ക് തുടർ ട്രെയിൻ: തൃശ്ശൂരിൽ (TCR) നിന്ന് എറണാകുളത്തേക്കും തിരുവനന്തപുരത്തേക്കും തുടർച്ചയായി ട്രെയിനുകളുണ്ട്.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Thrissur (TCR) halts almost all southbound and northbound express trains in Kerala.",
-                    "സൂചന: കേരളത്തിലെ മിക്കവാറും എല്ലാ എക്സ്പ്രസ് ട്രെയിനുകൾക്കും തൃശ്ശൂർ (TCR) സ്റ്റേഷനിൽ സ്റ്റോപ്പുണ്ട്.",
-                ),
-            ),
-            (ExitOrigin::Church, ExitTarget::ThrissurKochiRail) => (
-                tr(lang, "30 km to TCR • 35 mins", "തൃശ്ശൂർ (TCR) 30 കി.മീ • 35 മിനിറ്റ്"),
-                tr(
-                    lang,
-                    "Lourde Matha Forane Church → Thrissur (TCR) & Kochi (ERS)",
-                    "ലൂർദ് മാതാ ഫൊറോന പള്ളി → തൃശ്ശൂർ (TCR) & കൊച്ചി (ERS)",
-                ),
-                tr(
-                    lang,
-                    "Uber / Cab / Bus to Thrissur (TCR): 35-minute ride west to Thrissur Railway Station.",
-                    "തൃശ്ശൂരിലേക്ക് ഊബർ / ക്യാബ് / ബസ്: 35 മിനിറ്റിൽ തൃശ്ശൂർ റെയിൽവേ സ്റ്റേഷനിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Onward to Kochi (ERS): Board a 1 hr 15 min train from TCR to Ernakulam, or continue by cab (1 hr 50 mins total).",
-                    "കൊച്ചിയിലേക്ക് (ERS): തൃശ്ശൂരിൽ നിന്ന് 1 മണിക്കൂർ 15 മിനിറ്റ് ട്രെയിൻ മാർഗ്ഗമോ ക്യാബിലോ എറണാകുളത്തെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Frequent KSRTC buses from Vadakkencherry drop right near Thrissur Railway Station.",
-                    "സൂചന: വടക്കഞ്ചേരിയിൽ നിന്ന് തൃശ്ശൂർ സ്റ്റേഷൻ പരിസരത്തേക്ക് എപ്പോഴും ബസുകൾ ലഭ്യമാണ്.",
-                ),
-            ),
-            (ExitOrigin::ThrissurStay, ExitTarget::ThrissurKochiRail) => (
-                tr(lang, "10 mins to TCR • 1 hr 15m to ERS", "TCR-ലേക്ക് 10 മിനിറ്റ് • കൊച്ചി 1 മണിക്കൂർ 15 മി."),
-                tr(
-                    lang,
-                    "Thrissur Hotels → Thrissur Station (TCR) / Kochi (ERS)",
-                    "തൃശ്ശൂർ ഹോട്ടലുകൾ → തൃശ്ശൂർ സ്റ്റേഷൻ (TCR) / കൊച്ചി (ERS)",
-                ),
-                tr(
-                    lang,
-                    "Board Directly at Thrissur (TCR): Just a 5–10 minute Uber/auto hop from Thrissur hotels to the railway station.",
-                    "തൃശ്ശൂർ സ്റ്റേഷനിൽ (TCR) നിന്ന് കയറാം: ഹോട്ടലുകളിൽ നിന്ന് 5–10 മിനിറ്റ് യാത്ര മാത്രമേ സ്റ്റേഷനിലേക്കുള്ളൂ.",
-                ),
-                tr(
-                    lang,
-                    "Train to Kochi (ERS / ERN): Vande Bharat, Jan Shatabdi & Intercity trains reach Kochi in 1 hr to 1 hr 15 mins.",
-                    "കൊച്ചിയിലേക്ക് ട്രെയിൻ: വന്ദേ ഭാരത്, ജനശതാബ്ദി, ഇന്റർസിറ്റി ട്രെയിനുകളിൽ 1 മണിക്കൂറിനുള്ളിൽ കൊച്ചിയിലെത്താം.",
-                ),
-                tr(
-                    lang,
-                    "Tip: Morning trains from TCR to Ernakulam run every 30–45 minutes.",
-                    "സൂചന: രാവിലെ തൃശ്ശൂരിൽ നിന്ന് എറണാകുളത്തേക്ക് 30–45 മിനിറ്റ് ഇടവേളയിൽ ട്രെയിനുകൾ ലഭ്യമാണ്.",
-                ),
-            ),
-        };
-
-    rsx! {
-        div { id: "journey-planner", class: "smart-planner-wrap", "data-reveal": "",
-            div { class: "section-header header-compact",
-                span { class: "route-journey-pill", {tr(lang, "INTERACTIVE GOOGLE MAPS PLANNER", "ഗൂഗിൾ മാപ്പ് യാത്രാ പ്ലാനർ")} }
-                h2 { class: "section-heading", {tr(lang, "Smart Journey Planner", "സ്മാർട്ട് യാത്രാ പ്ലാനർ")} }
-                div { class: "filigree-divider" }
-                p { class: "section-subcopy",
-                    {tr(
-                        lang,
-                        "Plan your arrival by flight or train—and map your return journey to Kochi Airport or Palakkad Station in one tap.",
-                        "വിമാനത്തിലോ ട്രെയിനിലോ എത്താനുള്ള വഴികളും, വിവാഹശേഷം കൊച്ചി എയർപോർട്ടിലേക്കോ പാലക്കാട് സ്റ്റേഷനിലേക്കോ മടങ്ങാനുള്ള മാർഗ്ഗങ്ങളും പ്ലാൻ ചെയ്യാം.",
-                    )}
-                }
-            }
-
-            div { class: "planner-shell",
-                /* Top Direction Switcher: Arrival vs Return / Exit */
-                div {
-                    class: "planner-phase-bar",
-                    role: "tablist",
-                    aria_label: tr(lang, "Journey direction", "യാത്രാ ദിശ"),
-                    button {
-                        r#type: "button",
-                        role: "tab",
-                        aria_selected: if phase() == PlannerPhase::Arrival { "true" } else { "false" },
-                        class: if phase() == PlannerPhase::Arrival { "planner-phase-btn is-active" } else { "planner-phase-btn" },
-                        onclick: move |_| phase.set(PlannerPhase::Arrival),
-                        span { class: "phase-icon", "✦" }
-                        span { {tr(lang, "Arrival to Wedding", "വിവാഹത്തിലേക്കുള്ള വരവ്")} }
-                    }
-                    button {
-                        r#type: "button",
-                        role: "tab",
-                        aria_selected: if phase() == PlannerPhase::Exit { "true" } else { "false" },
-                        class: if phase() == PlannerPhase::Exit { "planner-phase-btn is-active is-exit-active" } else { "planner-phase-btn" },
-                        onclick: move |_| phase.set(PlannerPhase::Exit),
-                        span { class: "phase-icon", "↩" }
-                        span { {tr(lang, "Return / Exit Journey", "മടക്കയാത്ര (Exit)")} }
-                    }
-                }
-
-                if phase() == PlannerPhase::Arrival {
-                    div { class: "planner-body",
-                        /* Primary Mode Tabs: 1. Flight - Kochi | 2. Train - Kochi & Palakkad */
-                        div { class: "planner-mode-tabs",
-                            button {
-                                r#type: "button",
-                                class: if arrival_channel() == ArrivalChannel::FlightKochi { "planner-mode-card is-selected" } else { "planner-mode-card" },
-                                onclick: move |_| arrival_channel.set(ArrivalChannel::FlightKochi),
-                                span { class: "mode-badge", "✈" }
-                                div { class: "mode-card-text",
-                                    span { class: "mode-card-kicker", {tr(lang, "Option 01 • Air", "ഓപ്ഷൻ 01 • വിമാനം")} }
-                                    strong { {tr(lang, "Flight — Kochi (COK)", "വിമാനം — കൊച്ചി (COK)")} }
-                                    span { class: "mode-card-sub", {tr(lang, "COK → Thrissur Hotels → Wedding Church", "COK → തൃശ്ശൂർ ഹോട്ടലുകൾ → വിവാഹ പള്ളി")} }
-                                }
-                            }
-                            button {
-                                r#type: "button",
-                                class: if arrival_channel() == ArrivalChannel::TrainHubs { "planner-mode-card is-selected" } else { "planner-mode-card" },
-                                onclick: move |_| arrival_channel.set(ArrivalChannel::TrainHubs),
-                                span { class: "mode-badge", "🚆" }
-                                div { class: "mode-card-text",
-                                    span { class: "mode-card-kicker", {tr(lang, "Option 02 • Rail", "ഓപ്ഷൻ 02 • ട്രെയിൻ")} }
-                                    strong { {tr(lang, "Train — Palakkad & Kochi", "ട്രെയിൻ — പാലക്കാട് & കൊച്ചി")} }
-                                    span { class: "mode-card-sub", {tr(lang, "Reach PGT or ERS → Transfer to Church", "പാലക്കാട് / കൊച്ചി → പള്ളിയിലേക്കുള്ള വഴി")} }
-                                }
-                            }
-                        }
-
-                        if arrival_channel() == ArrivalChannel::FlightKochi {
-                            div { class: "planner-flow-stage",
-                                div { class: "planner-subfilter-row",
-                                    span { class: "subfilter-label", {tr(lang, "Route Style:", "യാത്രാ രീതി:")} }
-                                    div { class: "subfilter-pills",
-                                        button {
-                                            r#type: "button",
-                                            class: if flight_path() == FlightPath::ViaThrissurStay { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                            onclick: move |_| flight_path.set(FlightPath::ViaThrissurStay),
-                                            {tr(lang, "Via Thrissur (Most Hotels • Recommended)", "തൃശ്ശൂർ ഹോട്ടലുകൾ വഴി (ശുപാർശ ചെയ്യുന്നത്)")}
-                                        }
-                                        button {
-                                            r#type: "button",
-                                            class: if flight_path() == FlightPath::DirectToChurch { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                            onclick: move |_| flight_path.set(FlightPath::DirectToChurch),
-                                            {tr(lang, "Direct COK → Wedding Church", "നേരിട്ട് COK → വിവാഹ പള്ളി")}
-                                        }
-                                    }
-                                }
-
-                                if flight_path() == FlightPath::ViaThrissurStay {
-                                    /* Live Visual Chain */
-                                    div { class: "planner-chain-strip",
-                                        span { class: "chain-stop is-origin", {tr(lang, "✈ Kochi Airport (COK)", "✈ കൊച്ചി എയർപോർട്ട് (COK)")} }
-                                        span { class: "chain-leg", {tr(lang, "52 km • 1 hr 15m →", "52 കി.മീ • 1 മണി. 15 മി. →")} }
-                                        span { class: "chain-stop is-mid", {tr(lang, "⌂ Thrissur (Hotels)", "⌂ തൃശ്ശൂർ (ഹോട്ടലുകൾ)")} }
-                                        span { class: "chain-leg", {tr(lang, "30 km • 35 mins →", "30 കി.മീ • 35 മി. →")} }
-                                        span { class: "chain-stop is-dest", {tr(lang, "✟ Wedding Church (3:00 PM)", "✟ വിവാഹ പള്ളി (3:00 PM)")} }
-                                    }
-
-                                    div { class: "planner-legs-grid",
-                                        article { class: "planner-leg-card",
-                                            div { class: "leg-card-header",
-                                                span { class: "leg-step-badge", {tr(lang, "Leg 1 • Airport to Stay Hub", "ഘട്ടം 1 • എയർപോർട്ട് → തൃശ്ശൂർ")} }
-                                                span { class: "travel-distance-pill", {tr(lang, "52 km • 1 hr 15 mins", "52 കി.മീ • 1 മണിക്കൂർ 15 മിനിറ്റ്")} }
-                                            }
-                                            h3 { {tr(lang, "Kochi Airport (COK) → Thrissur Hotels", "കൊച്ചി എയർപോർട്ട് (COK) → തൃശ്ശൂർ ഹോട്ടലുകൾ")} }
-                                            p { class: "leg-lead",
-                                                {tr(
-                                                    lang,
-                                                    "Most family hotels, boutique stays, and Airbnbs are centered in Thrissur—an easy northward ride from Cochin Airport:",
-                                                    "ഭൂരിഭാഗം ഹോട്ടലുകളും എയർബിഎൻബികളും തൃശ്ശൂരിലാണ്. നെടുമ്പാശ്ശേരി എയർപോർട്ടിൽ (COK) നിന്ന് തൃശ്ശൂരിലെത്താനുള്ള വഴികൾ:",
-                                                )}
-                                            }
-                                            ul { class: "planner-option-list",
-                                                li {
-                                                    strong { {tr(lang, "Uber / Pre-paid Airport Taxi / Car Rental: ", "ഊബർ / പ്രീപെയ്ഡ് എയർപോർട്ട് ടാക്സി / റെന്റൽ കാർ: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Available 24×7 at COK Arrivals; drops you directly at your Thrissur hotel or Airbnb in 1 hr 10–15 mins.",
-                                                        "എയർപോർട്ട് അറൈവൽസിൽ 24×7 ലഭ്യമാണ്; 1 മണിക്കൂർ 15 മിനിറ്റിൽ തൃശ്ശൂരിലെ ഹോട്ടലിൽ നേരിട്ടെത്താം.",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "Aluva Feeder + Express Train: ", "ആലുവ ഫീഡർ + ട്രെയിൻ മാർഗ്ഗം: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Take the 20-min airport feeder bus/cab (12 km) to Aluva Railway Station (AWY), then a 45–55 min train to Thrissur (TCR).",
-                                                        "20 മിനിറ്റ് ഫീഡർ ബസ്/ക്യാബ് വഴി ആലുവ റെയിൽവേ സ്റ്റേഷനിലെത്തി (AWY), അവിടെ നിന്ന് 45–55 മിനിറ്റ് ട്രെയിനിൽ തൃശ്ശൂരിലെത്താം (TCR).",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "KSRTC Low-Floor AC Bus: ", "കെ.എസ്.ആർ.ടി.സി എസി ബസ്: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Direct airport AC buses connect COK to Thrissur Sakthan & Municipal stands.",
-                                                        "കൊച്ചി എയർപോർട്ടിൽ നിന്ന് തൃശ്ശൂരിലേക്ക് നേരിട്ടുള്ള എസി ലോ-ഫ്ലോർ ബസുകൾ ലഭ്യമാണ്.",
-                                                    )}
-                                                }
-                                            }
-                                            div { class: "leg-map-actions",
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Cochin+International+Airport,+Kochi,+Kerala&destination=Thrissur,+Kerala&travelmode=driving",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-solid",
-                                                    {tr(lang, "Google Maps: COK → Thrissur (Drive) ↗", "ഗൂഗിൾ മാപ്പ്: COK → തൃശ്ശൂർ (കാർ/ക്യാബ്) ↗")}
-                                                }
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Cochin+International+Airport,+Kochi,+Kerala&destination=Thrissur,+Kerala&travelmode=transit",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-outline",
-                                                    {tr(lang, "Transit (Train / Bus) ↗", "ട്രെയിൻ / ബസ് മാർഗ്ഗം ↗")}
-                                                }
-                                            }
-                                        }
-
-                                        article { class: "planner-leg-card is-church-accent",
-                                            div { class: "leg-card-header",
-                                                span { class: "leg-step-badge is-rose", {tr(lang, "Leg 2 • Stay Hub to Wedding", "ഘട്ടം 2 • തൃശ്ശൂർ → വിവാഹ പള്ളി")} }
-                                                span { class: "travel-distance-pill", {tr(lang, "30 km • 35–40 mins", "30 കി.മീ • 35–40 മിനിറ്റ്")} }
-                                            }
-                                            h3 { {tr(lang, "Thrissur → Lourde Matha Forane Church", "തൃശ്ശൂർ → ലൂർദ് മാതാ ഫൊറോന പള്ളി")} }
-                                            p { class: "leg-lead",
-                                                {tr(
-                                                    lang,
-                                                    "Head out from your Thrissur stay by 2:00 PM for the 3:00 PM Solemn Nuptial Mass in Vadakkencherry:",
-                                                    "3:00 PM-ലെ വിവാഹ കുർബാനയ്ക്കായി ഉച്ചയ്ക്ക് 2:00 PM-ഓടെ തൃശ്ശൂരിലെ ഹോട്ടലിൽ നിന്ന് തിരിക്കാം:",
-                                                )}
-                                            }
-                                            ul { class: "planner-option-list",
-                                                li {
-                                                    strong { {tr(lang, "Uber / Hotel Cab / Car Rental: ", "ഊബർ / ഹോട്ടൽ ക്യാബ് / റെന്റൽ കാർ: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Smooth 35-minute drive right to the church; TMK Arena (7:00 PM Reception) is just 3.5 km (6 mins) further.",
-                                                        "35 മിനിറ്റിൽ പള്ളിയിലെത്താം; തുടർന്ന് 7:00 PM വിരുന്ന് നടക്കുന്ന TMK അരീനയിലേക്ക് 3.5 കി.മീ (6 മിനിറ്റ്) മാത്രം.",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "Direct Fast Bus: ", "നേരിട്ടുള്ള ബസ് സൗകര്യം: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "All Palakkad-bound KSRTC & fast buses from Thrissur stop at Vadakkencherry (5 mins from the church).",
-                                                        "തൃശ്ശൂരിൽ നിന്ന് പാലക്കാട് ഭാഗത്തേക്കുള്ള എല്ലാ ബസുകളും പള്ളിക്ക് അടുത്തുള്ള വടക്കഞ്ചേരിയിൽ നിർത്തും.",
-                                                    )}
-                                                }
-                                            }
-                                            div { class: "leg-map-actions",
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Thrissur,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-solid-rose",
-                                                    {tr(lang, "Google Maps: Thrissur → Church ↗", "ഗൂഗിൾ മാപ്പ്: തൃശ്ശൂർ → പള്ളി ↗")}
-                                                }
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&destination=TMK+Arena,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-outline",
-                                                    {tr(lang, "Church → TMK Arena (3.5 km) ↗", "പള്ളി → TMK അരീന (3.5 കി.മീ) ↗")}
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    div { class: "planner-master-bar",
-                                        span { class: "master-bar-note",
-                                            {tr(
-                                                lang,
-                                                "Want the entire multi-stop drive open at once?",
-                                                "മുഴുവൻ യാത്രയും ഒറ്റ മാപ്പിൽ കാണണോ?",
-                                            )}
-                                        }
-                                        a {
-                                            href: "https://www.google.com/maps/dir/?api=1&origin=Cochin+International+Airport,+Kochi,+Kerala&destination=TMK+Arena,+Vadakkencherry,+Kerala+678683&waypoints=Thrissur,+Kerala%7CLourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                            target: "_blank",
-                                            rel: "noopener noreferrer",
-                                            class: "gmap-master-link",
-                                            {tr(
-                                                lang,
-                                                "Open Full Multi-Stop Google Map (COK → Thrissur → Church → Reception) ↗",
-                                                "പൂർണ്ണ ഗൂഗിൾ മാപ്പ് തുറക്കുക (COK → തൃശ്ശൂർ → പള്ളി → വിരുന്ന്) ↗",
-                                            )}
-                                        }
-                                    }
-                                } else {
-                                    /* Direct COK -> Church */
-                                    div { class: "planner-chain-strip",
-                                        span { class: "chain-stop is-origin", {tr(lang, "✈ Kochi Airport (COK)", "✈ കൊച്ചി എയർപോർട്ട് (COK)")} }
-                                        span { class: "chain-leg", {tr(lang, "75 km • 1 hr 25 mins →", "75 കി.മീ • 1 മണി. 25 മി. →")} }
-                                        span { class: "chain-stop is-dest", {tr(lang, "✟ Wedding Church (3:00 PM)", "✟ വിവാഹ പള്ളി (3:00 PM)")} }
-                                        span { class: "chain-leg", {tr(lang, "3.5 km • 6 mins →", "3.5 കി.മീ • 6 മി. →")} }
-                                        span { class: "chain-stop is-mid", {tr(lang, "★ TMK Arena (7:00 PM)", "★ TMK അരീന (7:00 PM)")} }
-                                    }
-
-                                    article { class: "planner-leg-card is-single-wide is-church-accent",
-                                        div { class: "leg-card-header",
-                                            span { class: "leg-step-badge is-rose", {tr(lang, "Direct Airport Transfer", "നേരിട്ടുള്ള എയർപോർട്ട് യാത്ര")} }
-                                            span { class: "travel-distance-pill", {tr(lang, "75 km • 1 hr 25 mins", "75 കി.മീ • 1 മണിക്കൂർ 25 മിനിറ്റ്")} }
-                                        }
-                                        h3 { {tr(lang, "Cochin Airport (COK) → Lourde Matha Forane Church", "കൊച്ചി എയർപോർട്ട് (COK) → ലൂർദ് മാതാ ഫൊറോന പള്ളി")} }
-                                        p { class: "leg-lead",
-                                            {tr(
-                                                lang,
-                                                "Flying in on Sunday morning (Jan 24) or staying in Vadakkencherry? Head straight from COK Airport to the church:",
-                                                "ഞായറാഴ്ച രാവിലെ എത്തുന്നവർക്കും വടക്കഞ്ചേരിയിൽ താമസിക്കുന്നവർക്കും എയർപോർട്ടിൽ നിന്ന് നേരിട്ട് പള്ളിയിലേക്ക് വരാം:",
-                                            )}
-                                        }
-                                        ul { class: "planner-option-list",
-                                            li {
-                                                strong { {tr(lang, "Pre-paid Airport Cab / Uber / Self-Drive Rental: ", "പ്രീപെയ്ഡ് എയർപോർട്ട് ടാക്സി / ഊബർ / റെന്റൽ കാർ: ")} }
-                                                {tr(
-                                                    lang,
-                                                    "Direct 1 hr 25 min ride via Thrissur right into Vadakkencherry.",
-                                                    "തൃശ്ശൂർ വഴി 1 മണിക്കൂർ 25 മിനിറ്റിൽ നേരിട്ട് വടക്കഞ്ചേരി പള്ളിയിലെത്താം.",
-                                                )}
-                                            }
-                                            li {
-                                                strong { {tr(lang, "Bus via Thrissur / Angamaly: ", "ബസ് മാർഗ്ഗം: ")} }
-                                                {tr(
-                                                    lang,
-                                                    "Board a Palakkad-bound KSRTC bus to alight directly at Vadakkencherry.",
-                                                    "പാലക്കാട് ഭാഗത്തേക്കുള്ള കെ.എസ്.ആർ.ടി.സി ബസിൽ വടക്കഞ്ചേരിയിൽ നേരിട്ടിറങ്ങാം.",
-                                                )}
-                                            }
-                                        }
-                                        div { class: "leg-map-actions",
-                                            a {
-                                                href: "https://www.google.com/maps/dir/?api=1&origin=Cochin+International+Airport,+Kochi,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                                target: "_blank",
-                                                rel: "noopener noreferrer",
-                                                class: "gmap-btn is-solid-rose",
-                                                {tr(lang, "Google Maps: COK → Church (Drive) ↗", "ഗൂഗിൾ മാപ്പ്: COK → പള്ളി (ക്യാബ്) ↗")}
-                                            }
-                                            a {
-                                                href: "https://www.google.com/maps/dir/?api=1&origin=Cochin+International+Airport,+Kochi,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=transit",
-                                                target: "_blank",
-                                                rel: "noopener noreferrer",
-                                                class: "gmap-btn is-outline",
-                                                {tr(lang, "Google Maps: Transit ↗", "ഗൂഗിൾ മാപ്പ്: ട്രാൻസിറ്റ് ↗")}
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            /* Option 2: Train — Palakkad & Kochi */
-                            div { class: "planner-flow-stage",
-                                div { class: "planner-subfilter-row",
-                                    span { class: "subfilter-label", {tr(lang, "Choose Rail Hub:", "റെയിൽവേ സ്റ്റേഷൻ തിരഞ്ഞെടുക്കുക:")} }
-                                    div { class: "subfilter-pills",
-                                        button {
-                                            r#type: "button",
-                                            class: if train_gateway() == TrainGateway::Palakkad { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                            onclick: move |_| train_gateway.set(TrainGateway::Palakkad),
-                                            {tr(lang, "Palakkad Junction (PGT • 35 km)", "പാലക്കാട് ജംഗ്ഷൻ (PGT • 35 കി.മീ)")}
-                                        }
-                                        button {
-                                            r#type: "button",
-                                            class: if train_gateway() == TrainGateway::Kochi { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                            onclick: move |_| train_gateway.set(TrainGateway::Kochi),
-                                            {tr(lang, "Kochi / Ernakulam (ERS / ERN) & Thrissur", "കൊച്ചി (ERS / ERN) & തൃശ്ശൂർ")}
-                                        }
-                                    }
-                                }
-
-                                if train_gateway() == TrainGateway::Palakkad {
-                                    div { class: "planner-chain-strip",
-                                        span { class: "chain-stop is-origin", {tr(lang, "🚆 Your Departure City", "🚆 നിങ്ങളുടെ നഗരം")} }
-                                        span { class: "chain-leg", {tr(lang, "Direct Express →", "എക്സ്പ്രസ് ട്രെയിൻ →")} }
-                                        span { class: "chain-stop is-mid", {tr(lang, "🚉 Palakkad Jn (PGT)", "🚉 പാലക്കാട് ജംഗ്ഷൻ (PGT)")} }
-                                        span { class: "chain-leg", {tr(lang, "35 km • 40 mins →", "35 കി.മീ • 40 മി. →")} }
-                                        span { class: "chain-stop is-dest", {tr(lang, "✟ Wedding Church (3:00 PM)", "✟ വിവാഹ പള്ളി (3:00 PM)")} }
-                                    }
-
-                                    div { class: "planner-legs-grid",
-                                        article { class: "planner-leg-card",
-                                            div { class: "leg-card-header",
-                                                span { class: "leg-step-badge", {tr(lang, "Step 1 • How to Reach Palakkad", "ഘട്ടം 1 • പാലക്കാട് എങ്ങനെ എത്താം")} }
-                                                span { class: "travel-distance-pill", {tr(lang, "Station Code: PGT", "സ്റ്റേഷൻ കോഡ്: PGT")} }
-                                            }
-                                            h3 { {tr(lang, "Reaching Palakkad Junction (PGT)", "പാലക്കാട് ജംഗ്ഷനിലേക്ക് (PGT) എത്താൻ")} }
-                                            p { class: "leg-lead",
-                                                {tr(
-                                                    lang,
-                                                    "Palakkad Junction (PGT) is a major main-line rail hub with direct Vande Bharat, Shatabdi & overnight express trains from Bengaluru, Chennai, Coimbatore, Hyderabad, Mumbai, Delhi & Kochi.",
-                                                    "ബെംഗളൂരു, ചെന്നൈ, കോയമ്പത്തൂർ, ഹൈദരാബാദ്, മുംബൈ, ഡൽഹി, കൊച്ചി എന്നിവിടങ്ങളിൽ നിന്ന് നേരിട്ട് വന്ദേ ഭാരത്, എക്സ്പ്രസ് ട്രെയിനുകൾ എത്തുന്ന പ്രധാന റെയിൽവേ ഹബ്ബാണ് പാലക്കാട് ജംഗ്ഷൻ (PGT).",
-                                                )}
-                                            }
-                                            div { class: "city-origin-box",
-                                                span { class: "city-origin-label", {tr(lang, "Check Train Routes on Google Maps to Palakkad (PGT):", "പാലക്കാട്ടേക്കുള്ള (PGT) ട്രെയിൻ സമയം ഗൂഗിൾ മാപ്പിൽ കാണാം:")} }
-                                                div { class: "city-chips-row",
-                                                    a {
-                                                        href: "https://www.google.com/maps/dir/?api=1&destination=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&travelmode=transit",
-                                                        target: "_blank",
-                                                        rel: "noopener noreferrer",
-                                                        class: "city-route-chip is-highlight",
-                                                        {tr(lang, "📍 My Location → PGT ↗", "📍 എന്റെ ലൊക്കേഷൻ → PGT ↗")}
-                                                    }
-                                                    a {
-                                                        href: "https://www.google.com/maps/dir/?api=1&origin=Bengaluru,+Karnataka&destination=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&travelmode=transit",
-                                                        target: "_blank",
-                                                        rel: "noopener noreferrer",
-                                                        class: "city-route-chip",
-                                                        {tr(lang, "Bengaluru → PGT ↗", "ബെംഗളൂരു → PGT ↗")}
-                                                    }
-                                                    a {
-                                                        href: "https://www.google.com/maps/dir/?api=1&origin=Chennai+Central+Railway+Station,+Chennai&destination=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&travelmode=transit",
-                                                        target: "_blank",
-                                                        rel: "noopener noreferrer",
-                                                        class: "city-route-chip",
-                                                        {tr(lang, "Chennai → PGT ↗", "ചെന്നൈ → PGT ↗")}
-                                                    }
-                                                    a {
-                                                        href: "https://www.google.com/maps/dir/?api=1&origin=Coimbatore+Junction,+Coimbatore&destination=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&travelmode=transit",
-                                                        target: "_blank",
-                                                        rel: "noopener noreferrer",
-                                                        class: "city-route-chip",
-                                                        {tr(lang, "Coimbatore → PGT ↗", "കോയമ്പത്തൂർ → PGT ↗")}
-                                                    }
-                                                    a {
-                                                        href: "https://www.google.com/maps/dir/?api=1&origin=Ernakulam+Junction,+Kochi,+Kerala&destination=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&travelmode=transit",
-                                                        target: "_blank",
-                                                        rel: "noopener noreferrer",
-                                                        class: "city-route-chip",
-                                                        {tr(lang, "Kochi (ERS) → PGT ↗", "കൊച്ചി (ERS) → PGT ↗")}
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        article { class: "planner-leg-card is-church-accent",
-                                            div { class: "leg-card-header",
-                                                span { class: "leg-step-badge is-rose", {tr(lang, "Step 2 • Palakkad to Church", "ഘട്ടം 2 • പാലക്കാട് → വിവാഹ പള്ളി")} }
-                                                span { class: "travel-distance-pill", {tr(lang, "35 km • 40–45 mins", "35 കി.മീ • 40–45 മിനിറ്റ്")} }
-                                            }
-                                            h3 { {tr(lang, "Palakkad (PGT) → Lourde Matha Forane Church", "പാലക്കാട് (PGT) → ലൂർദ് മാതാ ഫൊറോന പള്ളി")} }
-                                            p { class: "leg-lead",
-                                                {tr(
-                                                    lang,
-                                                    "From Palakkad Junction, Vadakkencherry is an easy 40-minute westward ride:",
-                                                    "പാലക്കാട് ജംഗ്ഷനിൽ നിന്ന് 40 മിനിറ്റ് യാത്ര ചെയ്താൽ വടക്കഞ്ചേരി പള്ളിയിലെത്താം:",
-                                                )}
-                                            }
-                                            ul { class: "planner-option-list",
-                                                li {
-                                                    strong { {tr(lang, "Pre-paid Station Taxi / Uber / Rental: ", "പ്രീപെയ്ഡ് ടാക്സി / ഊബർ / റെന്റൽ കാർ: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "24×7 taxi counter outside PGT Platform 1 drops you straight at Lourde Matha Forane Church in 40 mins.",
-                                                        "പാലക്കാട് ജംഗ്ഷന് പുറത്തുള്ള പ്രീപെയ്ഡ് ടാക്സി / ഊബർ വഴി 40 മിനിറ്റിൽ നേരിട്ട് പള്ളിയിലെത്താം.",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "Direct KSRTC / Fast Bus: ", "നേരിട്ടുള്ള കെ.എസ്.ആർ.ടി.സി / ഫാസ്റ്റ് ബസ്: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Every Thrissur-bound bus from Palakkad stops at Vadakkencherry (45 mins; 5 mins from the church).",
-                                                        "പാലക്കാട് നിന്ന് തൃശ്ശൂർ ഭാഗത്തേക്കുള്ള എല്ലാ ബസുകളും വടക്കഞ്ചേരിയിൽ നിർത്തും (45 മിനിറ്റ്).",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "Staying in Palakkad? ", "പാലക്കാട് താമസിക്കുന്നവർക്ക്: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Palakkad town hotels are 10 mins from PGT—freshen up and depart by 2:00 PM for the 3:00 PM wedding.",
-                                                        "സ്റ്റേഷന് അടുത്തുള്ള ഹോട്ടലിൽ താമസിച്ച് ഉച്ചയ്ക്ക് 2:00 PM-ന് പള്ളിയിലേക്ക് പുറപ്പെടാം.",
-                                                    )}
-                                                }
-                                            }
-                                            div { class: "leg-map-actions",
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-solid-rose",
-                                                    {tr(lang, "Google Maps: Palakkad → Church (Drive) ↗", "ഗൂഗിൾ മാപ്പ്: പാലക്കാട് → പള്ളി (ക്യാബ്) ↗")}
-                                                }
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=transit",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-outline",
-                                                    {tr(lang, "Bus / Transit ↗", "ബസ് / ട്രാൻസിറ്റ് ↗")}
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    div { class: "planner-master-bar",
-                                        span { class: "master-bar-note",
-                                            {tr(
-                                                lang,
-                                                "Complete rail-arrival map including evening reception:",
-                                                "വിരുന്ന് വേദി ഉൾപ്പെടെയുള്ള പൂർണ്ണ ഗൂഗിൾ മാപ്പ്:",
-                                            )}
-                                        }
-                                        a {
-                                            href: "https://www.google.com/maps/dir/?api=1&origin=Palakkad+Junction+Railway+Station,+Palakkad,+Kerala&destination=TMK+Arena,+Vadakkencherry,+Kerala+678683&waypoints=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                            target: "_blank",
-                                            rel: "noopener noreferrer",
-                                            class: "gmap-master-link",
-                                            {tr(
-                                                lang,
-                                                "Open Full Google Map (Palakkad PGT → Church → TMK Arena) ↗",
-                                                "പൂർണ്ണ ഗൂഗിൾ മാപ്പ് തുറക്കുക (പാലക്കാട് PGT → പള്ളി → TMK അരീന) ↗",
-                                            )}
-                                        }
-                                    }
-                                } else {
-                                    /* Kochi / Ernakulam (ERS / ERN) & Thrissur (TCR) */
-                                    div { class: "planner-chain-strip",
-                                        span { class: "chain-stop is-origin", {tr(lang, "🚉 Kochi (ERS / ERN)", "🚉 കൊച്ചി (ERS / ERN)")} }
-                                        span { class: "chain-leg", {tr(lang, "Train 1 hr 15m →", "ട്രെയിൻ 1 മണി. 15 മി. →")} }
-                                        span { class: "chain-stop is-mid", {tr(lang, "⌂ Thrissur (TCR • Hotels)", "⌂ തൃശ്ശൂർ (TCR • ഹോട്ടലുകൾ)")} }
-                                        span { class: "chain-leg", {tr(lang, "30 km • 35 mins →", "30 കി.മീ • 35 മി. →")} }
-                                        span { class: "chain-stop is-dest", {tr(lang, "✟ Wedding Church (3:00 PM)", "✟ വിവാഹ പള്ളി (3:00 PM)")} }
-                                    }
-
-                                    div { class: "planner-legs-grid",
-                                        article { class: "planner-leg-card",
-                                            div { class: "leg-card-header",
-                                                span { class: "leg-step-badge", {tr(lang, "Step 1 • Kochi Rail & Thrissur Link", "ഘട്ടം 1 • കൊച്ചി & തൃശ്ശൂർ ട്രെയിൻ")} }
-                                                span { class: "travel-distance-pill", {tr(lang, "ERS / ERN → TCR", "ERS / ERN → TCR")} }
-                                            }
-                                            h3 { {tr(lang, "Arriving at Kochi (ERS / ERN) → Thrissur", "കൊച്ചിയിൽ (ERS / ERN) നിന്ന് തൃശ്ശൂരിലേക്ക്")} }
-                                            p { class: "leg-lead",
-                                                {tr(
-                                                    lang,
-                                                    "Reaching Ernakulam Junction (ERS) or Town (ERN)? Connect effortlessly to Thrissur (TCR), where most guest hotels & Airbnbs are located:",
-                                                    "എറണാകുളം ജംഗ്ഷനിലോ (ERS) നോർത്തിലോ (ERN) എത്തുന്നവർക്ക് ഹോട്ടലുകൾ കേന്ദ്രീകരിച്ചിരിക്കുന്ന തൃശ്ശൂരിലേക്ക് (TCR) എളുപ്പത്തിൽ എത്താം:",
-                                                )}
-                                            }
-                                            ul { class: "planner-option-list",
-                                                li {
-                                                    strong { {tr(lang, "Connecting Train (ERS → TCR, 1 hr 15 mins): ", "തുടർ ട്രെയിൻ (ERS → TCR, 1 മണിക്കൂർ 15 മിനിറ്റ്): ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Trains depart every 30–45 mins from Kochi to Thrissur. (Tip: Check if your train already stops directly at Thrissur TCR!)",
-                                                        "കൊച്ചിയിൽ നിന്ന് തൃശ്ശൂരിലേക്ക് തുടർച്ചയായി ട്രെയിനുകളുണ്ട്. (സൂചന: നിങ്ങളുടെ ട്രെയിനിന് തൃശ്ശൂരിൽ നേരിട്ട് സ്റ്റോപ്പുണ്ടോ എന്നും നോക്കാം!)",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "Uber / Cab / Rental Car: ", "ഊബർ / ക്യാബ് / റെന്റൽ കാർ: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "72 km (1 hr 35 mins) from Kochi to Thrissur hotels, or 85 km (1 hr 50 mins) straight to Vadakkencherry.",
-                                                        "കൊച്ചിയിൽ നിന്ന് തൃശ്ശൂരിലേക്ക് 72 കി.മീ, അല്ലെങ്കിൽ വടക്കഞ്ചേരിയിലേക്ക് നേരിട്ട് 85 കി.മീ.",
-                                                    )}
-                                                }
-                                            }
-                                            div { class: "leg-map-actions",
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&destination=Ernakulam+Junction,+Kochi,+Kerala&travelmode=transit",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-outline",
-                                                    {tr(lang, "📍 Trains to Kochi (ERS) ↗", "📍 കൊച്ചിയിലേക്കുള്ള ട്രെയിൻ ↗")}
-                                                }
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Ernakulam+Junction,+Kochi,+Kerala&destination=Thrissur+Railway+Station,+Thrissur,+Kerala&travelmode=transit",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-solid",
-                                                    {tr(lang, "Google Maps: Kochi → Thrissur Train ↗", "ഗൂഗിൾ മാപ്പ്: കൊച്ചി → തൃശ്ശൂർ ട്രെയിൻ ↗")}
-                                                }
-                                            }
-                                        }
-
-                                        article { class: "planner-leg-card is-church-accent",
-                                            div { class: "leg-card-header",
-                                                span { class: "leg-step-badge is-rose", {tr(lang, "Step 2 • Thrissur (TCR) to Church", "ഘട്ടം 2 • തൃശ്ശൂർ → വിവാഹ പള്ളി")} }
-                                                span { class: "travel-distance-pill", {tr(lang, "30 km • 35–40 mins", "30 കി.മീ • 35–40 മിനിറ്റ്")} }
-                                            }
-                                            h3 { {tr(lang, "Thrissur (TCR) → Lourde Matha Forane Church", "തൃശ്ശൂർ (TCR) → ലൂർദ് മാതാ ഫൊറോന പള്ളി")} }
-                                            p { class: "leg-lead",
-                                                {tr(
-                                                    lang,
-                                                    "From Thrissur Railway Station or your Thrissur hotel, reach Vadakkencherry smoothly:",
-                                                    "തൃശ്ശൂർ സ്റ്റേഷനിൽ നിന്നോ ഹോട്ടലിൽ നിന്നോ വടക്കഞ്ചേരി പള്ളിയിലേക്ക് സുഗമമായി എത്താം:",
-                                                )}
-                                            }
-                                            ul { class: "planner-option-list",
-                                                li {
-                                                    strong { {tr(lang, "Uber / Station Pre-paid Cab: ", "ഊബർ / പ്രീപെയ്ഡ് ടാക്സി: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "35-minute drive straight to Lourde Matha Forane Church (and 3.5 km onward to TMK Arena).",
-                                                        "35 മിനിറ്റിൽ ലൂർദ് മാതാ പള്ളിയിലും, തുടർന്ന് 3.5 കി.മീ അകലെയുള്ള TMK അരീനയിലും എത്താം.",
-                                                    )}
-                                                }
-                                                li {
-                                                    strong { {tr(lang, "KSRTC / Fast Bus: ", "കെ.എസ്.ആർ.ടി.സി / ഫാസ്റ്റ് ബസ്: ")} }
-                                                    {tr(
-                                                        lang,
-                                                        "Frequent buses from Thrissur Stand (adjacent to TCR station) drop at Vadakkencherry.",
-                                                        "തൃശ്ശൂർ സ്റ്റേഷന് തൊട്ടടുത്തുള്ള സ്റ്റാൻഡിൽ നിന്ന് വടക്കഞ്ചേരിയിലേക്ക് എപ്പോഴും ബസുകൾ ലഭ്യമാണ്.",
-                                                    )}
-                                                }
-                                            }
-                                            div { class: "leg-map-actions",
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Thrissur+Railway+Station,+Thrissur,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&travelmode=driving",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-solid-rose",
-                                                    {tr(lang, "Google Maps: TCR → Church (Drive) ↗", "ഗൂഗിൾ മാപ്പ്: TCR → പള്ളി (ക്യാബ്) ↗")}
-                                                }
-                                                a {
-                                                    href: "https://www.google.com/maps/dir/?api=1&origin=Ernakulam+Junction,+Kochi,+Kerala&destination=Lourde+Matha+Forane+Church,+Vadakkencherry,+Kerala+678683&waypoints=Thrissur,+Kerala&travelmode=driving",
-                                                    target: "_blank",
-                                                    rel: "noopener noreferrer",
-                                                    class: "gmap-btn is-outline",
-                                                    {tr(lang, "Full Map: Kochi → Thrissur → Church ↗", "മാപ്പ്: കൊച്ചി → തൃശ്ശൂർ → പള്ളി ↗")}
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    /* Return / Exit Journey Planner */
-                    div { class: "planner-body is-exit-mode",
-                        div { class: "exit-selectors-grid",
-                            div { class: "exit-selector-group",
-                                span { class: "subfilter-label", {tr(lang, "1. Leaving From:", "1. എവിടെ നിന്ന് തിരിക്കുന്നു:")} }
-                                div { class: "subfilter-pills",
-                                    button {
-                                        r#type: "button",
-                                        class: if exit_origin() == ExitOrigin::TmkArena { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                        onclick: move |_| exit_origin.set(ExitOrigin::TmkArena),
-                                        {tr(lang, "TMK Arena (After Reception)", "TMK അരീന (വിരുന്നിന് ശേഷം)")}
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if exit_origin() == ExitOrigin::Church { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                        onclick: move |_| exit_origin.set(ExitOrigin::Church),
-                                        {tr(lang, "Wedding Church", "വിവാഹ പള്ളി")}
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if exit_origin() == ExitOrigin::ThrissurStay { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                        onclick: move |_| exit_origin.set(ExitOrigin::ThrissurStay),
-                                        {tr(lang, "Thrissur Hotels (Next Day)", "തൃശ്ശൂർ ഹോട്ടലുകൾ")}
-                                    }
-                                }
-                            }
-
-                            div { class: "exit-selector-group",
-                                span { class: "subfilter-label", {tr(lang, "2. Exit Destination:", "2. മടങ്ങേണ്ട സ്ഥലം:")} }
-                                div { class: "subfilter-pills",
-                                    button {
-                                        r#type: "button",
-                                        class: if exit_target() == ExitTarget::KochiAirport { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                        onclick: move |_| exit_target.set(ExitTarget::KochiAirport),
-                                        {tr(lang, "✈ Kochi Airport (COK • Nearest)", "✈ കൊച്ചി എയർപോർട്ട് (COK)")}
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if exit_target() == ExitTarget::PalakkadStation { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                        onclick: move |_| exit_target.set(ExitTarget::PalakkadStation),
-                                        {tr(lang, "🚆 Palakkad Station (PGT)", "🚆 പാലക്കാട് സ്റ്റേഷൻ (PGT)")}
-                                    }
-                                    button {
-                                        r#type: "button",
-                                        class: if exit_target() == ExitTarget::ThrissurKochiRail { "subfilter-pill is-active" } else { "subfilter-pill" },
-                                        onclick: move |_| exit_target.set(ExitTarget::ThrissurKochiRail),
-                                        {tr(lang, "🚆 Thrissur (TCR) / Kochi (ERS)", "🚆 തൃശ്ശൂർ (TCR) / കൊച്ചി")}
-                                    }
-                                }
-                            }
-                        }
-
-                        div { class: "planner-chain-strip is-exit-chain",
-                            span { class: "chain-stop is-dest", "{origin_short}" }
-                            span { class: "chain-leg", "{exit_distance} →" }
-                            span { class: "chain-stop is-origin", "{target_short}" }
-                        }
-
-                        article { class: "planner-leg-card is-single-wide is-exit-card",
-                            div { class: "leg-card-header",
-                                span { class: "leg-step-badge", {tr(lang, "Return / Exit Route", "മടക്കയാത്രാ മാർഗ്ഗം")} }
-                                span { class: "travel-distance-pill", "{exit_distance}" }
-                            }
-                            h3 { "{exit_heading}" }
-                            ul { class: "planner-option-list",
-                                li { "{exit_opt_primary}" }
-                                li { "{exit_opt_secondary}" }
-                            }
-                            div { class: "exit-tip-banner",
-                                "{exit_tip}"
-                            }
-                            div { class: "leg-map-actions",
-                                a {
-                                    href: "{exit_drive_url}",
-                                    target: "_blank",
-                                    rel: "noopener noreferrer",
-                                    class: "gmap-btn is-solid",
-                                    {tr(lang, "Open Return Route in Google Maps (Drive / Cab) ↗", "മടക്കയാത്ര ഗൂഗിൾ മാപ്പിൽ (ക്യാബ് / കാർ) ↗")}
-                                }
-                                a {
-                                    href: "{exit_transit_url}",
-                                    target: "_blank",
-                                    rel: "noopener noreferrer",
-                                    class: "gmap-btn is-outline",
-                                    {tr(lang, "Open Return Transit (Train / Bus) ↗", "മടക്കയാത്ര (ട്രെയിൻ / ബസ്) ↗")}
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
