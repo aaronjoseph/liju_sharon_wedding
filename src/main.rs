@@ -727,7 +727,7 @@ fn BackgroundMusicFab() -> Element {
                 }
                 span { class: "bgm-label-stack",
                     span { class: "bgm-kicker",
-                        "{tr(lang, \"A Thousand Years\", \"വിവാഹ സംഗീതം\")}"
+                        "{tr(lang, \"Canon in D\", \"വിവാഹ സംഗീതം\")}"
                     }
                     span { class: "bgm-status-text",
                         if playing {
