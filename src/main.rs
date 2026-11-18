@@ -62,10 +62,10 @@ const ENHANCE_SCRIPT: &str = r##"
         { id: "invitation", en: "Invitation", ml: "ക്ഷണക്കത്ത്" },
         { id: "events", en: "The Wedding Day", ml: "വിവാഹ ദിനം" },
         { id: "memories", en: "Memory Wall", ml: "ഓർമ്മകളുടെ ചുവർ" },
+        { id: "rsvp", en: "RSVP & Arrival", ml: "RSVP & വരവ്" },
         { id: "palette", en: "What to Wear", ml: "വസ്ത്രധാരണം" },
         { id: "venue", en: "Visual Route", ml: "യാത്രാ മാർഗ്ഗം" },
         { id: "stay-travel", en: "Where to Stay", ml: "താമസ സൗകര്യങ്ങൾ" },
-        { id: "rsvp", en: "RSVP & Arrival", ml: "RSVP & വരവ്" },
     ];
     window.__slLang = window.__slLang || "en";
     let lastActiveKey = "";
@@ -591,9 +591,9 @@ fn App() -> Element {
             HeroInvitationScene {}
             EventsSection {}
             MemoryWallSection {}
+            RsvpSection {}
             AttireSection {}
             VenueAndTravelSection {}
-            RsvpSection {}
         }
         Footer {}
     }
@@ -664,15 +664,15 @@ fn Navbar() -> Element {
                     a { href: "#invitation", onclick: move |_| menu_open.set(false), "{tr(current, \"Invitation\", \"ക്ഷണക്കത്ത്\")}" }
                     a { href: "#events", onclick: move |_| menu_open.set(false), "{tr(current, \"The Wedding Day\", \"വിവാഹ ദിനം\")}" }
                     a { href: "#memories", onclick: move |_| menu_open.set(false), "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}" }
-                    a { href: "#palette", onclick: move |_| menu_open.set(false), "{tr(current, \"What to Wear\", \"വസ്ത്രധാരണം\")}" }
-                    a { href: "#venue", onclick: move |_| menu_open.set(false), "{tr(current, \"Visual Route\", \"യാത്രാ മാർഗ്ഗം\")}" }
-                    a { href: "#stay-travel", onclick: move |_| menu_open.set(false), "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}" }
                     a {
                         href: "#rsvp",
                         class: "popover-rsvp-link",
                         onclick: move |_| menu_open.set(false),
                         "{tr(current, \"RSVP & Arrival →\", \"RSVP & വരവ് →\")}"
                     }
+                    a { href: "#palette", onclick: move |_| menu_open.set(false), "{tr(current, \"What to Wear\", \"വസ്ത്രധാരണം\")}" }
+                    a { href: "#venue", onclick: move |_| menu_open.set(false), "{tr(current, \"Visual Route\", \"യാത്രാ മാർഗ്ഗം\")}" }
+                    a { href: "#stay-travel", onclick: move |_| menu_open.set(false), "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}" }
                 }
             }
         }
