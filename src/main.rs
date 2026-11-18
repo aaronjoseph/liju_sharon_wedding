@@ -4,6 +4,7 @@ use dioxus::prelude::*;
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const HERO_GHIBLI_BG: Asset = asset!("/assets/hero_ghibli_garden.jpg");
 const COUPLE_GHIBLI_CAMEO: Asset = asset!("/assets/couple_ghibli_cameo.jpg");
+const MEMORY_SELFIE_GHIBLI: Asset = asset!("/assets/memory_selfie_ghibli.jpg");
 
 const ROUTE_COK_AIRPORT: Asset = asset!("/assets/route_cok_airport.jpg");
 const ROUTE_THRISSUR: Asset = asset!("/assets/route_thrissur.jpg");
@@ -2024,8 +2025,8 @@ fn MemoryWallSection() -> Element {
                 }
 
                 div { class: "memory-wall-board", "data-reveal": "",
-                    /* Left: Compact 2-Card Polaroid Strip */
-                    div { class: "memory-polaroid-grid",
+                    /* Left: Single Clickable Couple Selfie Polaroid */
+                    div { class: "memory-polaroid-grid is-single",
                         a {
                             href: "{MEMORY_WALL_URL}",
                             target: "_blank",
@@ -2034,8 +2035,8 @@ fn MemoryWallSection() -> Element {
                             span { class: "polaroid-pin pin-rose", "aria-hidden": "true" }
                             div { class: "polaroid-photo-frame",
                                 img {
-                                    src: COUPLE_GHIBLI_CAMEO,
-                                    alt: "Liju & Sharon keepsake portrait — open Memory Wall",
+                                    src: MEMORY_SELFIE_GHIBLI,
+                                    alt: "Liju & Sharon selfie — open Google Photos Memory Wall",
                                     loading: "lazy",
                                     decoding: "async",
                                 }
@@ -2044,35 +2045,15 @@ fn MemoryWallSection() -> Element {
                                 "{tr(lang, \"Liju & Sharon\", \"ലിജു & ഷാരോൺ\")}"
                             }
                         }
-
-                        a {
-                            href: "{MEMORY_WALL_URL}",
-                            target: "_blank",
-                            rel: "noopener noreferrer",
-                            class: "memory-polaroid polaroid-drop-slot polaroid-tilt-right",
-                            span { class: "polaroid-pin pin-gold", "aria-hidden": "true" }
-                            div { class: "polaroid-drop-well",
-                                span { class: "drop-camera-badge", "aria-hidden": "true", "📸" }
-                                span { class: "drop-slot-title",
-                                    "{tr(lang, \"+ Your Snapshot\", \"+ നിങ്ങളുടെ ചിത്രം\")}"
-                                }
-                                span { class: "drop-slot-sub",
-                                    "{tr(lang, \"Tap to drop in ↗\", \"ഇവിടെ ചേർക്കാം ↗\")}"
-                                }
-                            }
-                            span { class: "polaroid-caption polaroid-caption-accent",
-                                "{tr(lang, \"Add to Memory Wall\", \"മെമ്മറി വാളിൽ ചേർക്കൂ\")}"
-                            }
-                        }
                     }
 
                     /* Right: Compact Shared Album Drop & View Hub */
                     div { class: "memory-drop-hub",
                         h3 { class: "memory-hub-title",
-                            "{tr(lang, \"Drop Your Wedding Photos & Videos\", \"നിങ്ങളുടെ ചിത്രങ്ങളും വീഡിയോകളും ചേർക്കൂ\")}"
+                            "{tr(lang, \"Add Your Favourite Photos & Videos\", \"നിങ്ങളുടെ പ്രിയപ്പെട്ട ചിത്രങ്ങളും വീഡിയോകളും ചേർക്കൂ\")}"
                         }
                         p { class: "memory-hub-copy",
-                            "{tr(lang, \"Share candid clicks and short clips from the day straight into our shared Google Photos album.\", \"വിവാഹ ദിനത്തിലെ നല്ല നിമിഷങ്ങളും വീഡിയോകളും ഞങ്ങളുടെ ഷെയേർഡ് ഗൂഗിൾ ഫോട്ടോസ് ആൽബത്തിലേക്ക് നേരിട്ട് ചേർക്കാം.\")}"
+                            "{tr(lang, \"Add any pictures you like, favourite throwback moments, candid clicks, or short clips straight into our shared Google Photos album.\", \"നിങ്ങൾക്കിഷ്ടപ്പെട്ട ചിത്രങ്ങളും, പ്രിയപ്പെട്ട ഓർമ്മകളും, ചെറു വീഡിയോകളും നമ്മുടെ പങ്കുവെച്ച ഗൂഗിൾ ഫോട്ടോസ് ആൽബത്തിലേക്ക് നേരിട്ട് ചേർക്കാം.\")}"
                         }
 
                         div { class: "memory-cta-stack",

@@ -3455,6 +3455,12 @@ h4 {
     border: 1px dashed rgba(181, 142, 84, 0.38);
 }
 
+.memory-polaroid-grid.is-single {
+    grid-template-columns: minmax(0, 250px);
+    justify-content: center;
+    padding: 1.05rem;
+}
+
 .memory-polaroid {
     position: relative;
     display: flex;
