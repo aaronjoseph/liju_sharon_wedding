@@ -830,7 +830,8 @@ fn Navbar() -> Element {
                             menu_open.set(false);
                             navigate_to_page(active_page, ActivePage::Home, Some("rsvp"));
                         },
-                        "RSVP"
+                        span { class: "nav-rsvp-dot", "aria-hidden": "true" }
+                        span { class: "nav-rsvp-text", "RSVP" }
                     }
                 }
 
@@ -1119,7 +1120,20 @@ fn HeroInvitationScene() -> Element {
                         }
 
                         div { class: "hero-actions",
-                            a { href: "#rsvp", class: "btn btn-rose", "{tr(lang, \"RSVP & Arrival\", \"RSVP & വരവ്\")}" }
+                            div { class: "rsvp-nudge-wrap",
+                                span { class: "rsvp-float-badge", "aria-hidden": "true",
+                                    span { class: "rsvp-badge-spark", "✦" }
+                                    "{tr(lang, \"Kindly RSVP\", \"ദയവായി RSVP ചെയ്യൂ\")}"
+                                    span { class: "rsvp-badge-caret" }
+                                }
+                                a { href: "#rsvp", class: "btn btn-rose btn-rsvp-nudge",
+                                    span { class: "btn-rsvp-shimmer", "aria-hidden": "true" }
+                                    span { class: "btn-rsvp-label",
+                                        "{tr(lang, \"RSVP & Arrival\", \"RSVP & വരവ്\")}"
+                                    }
+                                    span { class: "rsvp-arrow-bob", "aria-hidden": "true", "↓" }
+                                }
+                            }
                         }
                     }
                 }
@@ -1727,12 +1741,15 @@ fn TravelPageView() -> Element {
                             }
                             a {
                                 href: "#rsvp",
-                                class: "btn btn-rose",
+                                class: "btn btn-rose btn-rsvp-nudge",
                                 onclick: move |evt| {
                                     evt.prevent_default();
                                     navigate_to_page(active_page, ActivePage::Home, Some("rsvp"));
                                 },
-                                "{tr(lang, \"RSVP & Arrival\", \"RSVP & വരവ്\")}"
+                                span { class: "btn-rsvp-shimmer", "aria-hidden": "true" }
+                                span { class: "btn-rsvp-label",
+                                    "{tr(lang, \"RSVP & Arrival\", \"RSVP & വരവ്\")}"
+                                }
                             }
                         }
                     }

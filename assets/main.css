@@ -389,9 +389,12 @@ h4 {
 }
 
 .nav-rsvp-pill {
+    position: relative;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.36rem;
     padding: 0.36rem 0.92rem;
     border-radius: 999px;
     background: linear-gradient(135deg, var(--dusty-rose) 0%, var(--dusty-rose-deep) 100%);
@@ -403,6 +406,40 @@ h4 {
     text-decoration: none;
     box-shadow: 0 4px 12px rgba(169, 92, 107, 0.26);
     transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.nav-rsvp-pill::after {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -60%;
+    width: 48%;
+    height: 180%;
+    background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 253, 249, 0.48) 50%,
+        transparent 100%
+    );
+    transform: skewX(-18deg);
+    animation: rsvpSheenSweep 3.8s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+    pointer-events: none;
+}
+
+.nav-rsvp-dot {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff4df;
+    box-shadow: 0 0 0 0 rgba(255, 244, 223, 0.72);
+    animation: navRsvpDotPulse 2.2s ease-out infinite;
+    flex-shrink: 0;
+}
+
+.nav-rsvp-text {
+    position: relative;
+    z-index: 1;
 }
 
 .nav-rsvp-pill:hover,
@@ -979,6 +1016,7 @@ h4 {
     align-items: center;
     justify-content: space-between;
     gap: 1rem 1.5rem;
+    padding-top: 0.55rem;
 }
 
 .countdown-pill {
@@ -1026,6 +1064,169 @@ h4 {
     display: flex;
     flex-wrap: wrap;
     gap: 0.7rem;
+}
+
+/* Gentle Moving Nudge Elements Over RSVP Button */
+.rsvp-nudge-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rsvp-float-badge {
+    position: absolute;
+    bottom: calc(100% + 9px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    padding: 0.2rem 0.68rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fffdf9 0%, #fcf2e4 100%);
+    border: 1px solid rgba(181, 142, 84, 0.46);
+    box-shadow: 0 6px 16px rgba(169, 92, 107, 0.18);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dusty-rose-deep);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 3;
+    animation: rsvpBadgeFloat 2.1s ease-in-out infinite;
+}
+
+.rsvp-badge-spark {
+    color: var(--antique-gold);
+    font-size: 0.68rem;
+    animation: rsvpSparkTwinkle 2.1s ease-in-out infinite;
+}
+
+.rsvp-badge-caret {
+    position: absolute;
+    left: 50%;
+    bottom: -4.5px;
+    width: 8px;
+    height: 8px;
+    background: #fcf2e4;
+    border-right: 1px solid rgba(181, 142, 84, 0.46);
+    border-bottom: 1px solid rgba(181, 142, 84, 0.46);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.btn-rsvp-nudge {
+    position: relative;
+    isolation: isolate;
+}
+
+.btn-rsvp-nudge::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    border: 2px solid rgba(214, 138, 152, 0.58);
+    pointer-events: none;
+    z-index: -1;
+    animation: rsvpHaloPulse 2.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.btn-rsvp-shimmer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.btn-rsvp-shimmer::after {
+    content: "";
+    position: absolute;
+    top: -35%;
+    left: -65%;
+    width: 46%;
+    height: 170%;
+    background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 253, 249, 0.46) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: rsvpSheenSweep 3.1s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+.btn-rsvp-label {
+    position: relative;
+    z-index: 1;
+}
+
+.rsvp-arrow-bob {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    font-size: 0.92rem;
+    line-height: 1;
+    animation: rsvpArrowBob 1.75s ease-in-out infinite;
+}
+
+@keyframes rsvpBadgeFloat {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+@keyframes rsvpSparkTwinkle {
+    0%, 100% {
+        opacity: 0.72;
+        transform: scale(0.92) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.18) rotate(18deg);
+    }
+}
+
+@keyframes rsvpHaloPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    70%, 100% {
+        transform: scale(1.11, 1.32);
+        opacity: 0;
+    }
+}
+
+@keyframes rsvpSheenSweep {
+    0% {
+        left: -65%;
+    }
+    38%, 100% {
+        left: 135%;
+    }
+}
+
+@keyframes rsvpArrowBob {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(3px);
+    }
+}
+
+@keyframes navRsvpDotPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 244, 223, 0.78);
+    }
+    70%, 100% {
+        box-shadow: 0 0 0 6px rgba(255, 244, 223, 0);
+    }
 }
 
 .hero-meadow-wave {
@@ -4227,9 +4428,15 @@ html.reveal-ready [data-reveal].is-visible {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.55rem;
         width: 100%;
+        margin-top: 1.15rem;
+    }
+
+    .rsvp-nudge-wrap {
+        width: 100%;
     }
 
     .hero-actions .btn {
+        width: 100%;
         padding: 0.78rem 1.1rem;
         font-size: 0.76rem;
         letter-spacing: 0.08em;
