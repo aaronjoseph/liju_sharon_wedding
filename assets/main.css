@@ -986,9 +986,9 @@ h4 {
 
 /* Warm Frosted Pearl & Champagne Invitation Dock */
 .hero-dock {
-    width: 100%;
-    max-width: 790px;
-    padding: 1.3rem 1.75rem;
+    width: fit-content;
+    max-width: min(640px, 100%);
+    padding: 1.15rem 1.7rem;
     border-radius: 26px;
     background: rgba(255, 253, 249, 0.92);
     backdrop-filter: blur(16px);
@@ -998,8 +998,8 @@ h4 {
 }
 
 .dock-date-row {
-    padding-bottom: 0.9rem;
-    margin-bottom: 0.95rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.9rem;
     border-bottom: 1px solid rgba(181, 142, 84, 0.2);
 }
 
@@ -1014,8 +1014,8 @@ h4 {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem 1.5rem;
+    justify-content: center;
+    gap: 1rem 1.85rem;
     padding-top: 0.55rem;
 }
 
@@ -4383,6 +4383,7 @@ html.reveal-ready [data-reveal].is-visible {
     }
 
     .hero-dock {
+        width: 100%;
         padding: 1.1rem 1rem;
         border-radius: 22px;
     }
