@@ -234,6 +234,8 @@ const ENHANCE_SCRIPT: &str = r##"
         const cleanupUnlock = () => {
             window.removeEventListener("pointerdown", unlockOnGesture, true);
             window.removeEventListener("touchstart", unlockOnGesture, true);
+            window.removeEventListener("touchend", unlockOnGesture, true);
+            window.removeEventListener("click", unlockOnGesture, true);
             window.removeEventListener("keydown", unlockOnGesture, true);
         };
 
@@ -242,6 +244,8 @@ const ENHANCE_SCRIPT: &str = r##"
             if (!ok && !userStopped) {
                 window.addEventListener("pointerdown", unlockOnGesture, { capture: true, passive: true });
                 window.addEventListener("touchstart", unlockOnGesture, { capture: true, passive: true });
+                window.addEventListener("touchend", unlockOnGesture, { capture: true, passive: true });
+                window.addEventListener("click", unlockOnGesture, { capture: true, passive: true });
                 window.addEventListener("keydown", unlockOnGesture, { capture: true, passive: true });
             }
         });
@@ -694,6 +698,8 @@ fn BackgroundMusicFab() -> Element {
                 autoplay: true,
                 r#loop: true,
                 preload: "auto",
+                "playsinline": "true",
+                "webkit-playsinline": "true",
                 onplay: move |_| is_playing.set(true),
                 onpause: move |_| is_playing.set(false),
                 onended: move |_| is_playing.set(false),
