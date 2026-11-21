@@ -628,7 +628,8 @@ fn navigate_to_page(
                         return;
                     }}
                 }}
-                window.scrollTo({{ top: 0, behavior: 'auto' }});
+                window.scrollTo({{ top: 0, left: 0, behavior: 'instant' }});
+                document.documentElement.scrollTop = 0;
             }};
             requestAnimationFrame(() => requestAnimationFrame(go));
         }})();
@@ -700,7 +701,8 @@ fn App() -> Element {
                                     return;
                                 }
                             }
-                            window.scrollTo({ top: 0, behavior: "auto" });
+                            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+                            document.documentElement.scrollTop = 0;
                         }));
                         "##,
                     );
