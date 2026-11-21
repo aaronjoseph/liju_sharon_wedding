@@ -1,0 +1,25 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Liju & Sharon//Wedding Invitation 2027//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:liju-sharon-wedding-20270124@liju-and-sharon.netlify.app
+DTSTAMP:20261115T090000Z
+DTSTART:20270124T093000Z
+DTEND:20270124T113000Z
+SUMMARY:Liju & Sharon - Wedding
+DESCRIPTION:Holy Matrimony of Liju & Sharon at Lourde Matha Forane Church\,
+  Vadakkencherry.\nGoogle Maps: https://maps.app.goo.gl/3imLUGfDBieyiQkd6?g
+ _st=iw
+LOCATION:Lourde Matha Forane Church\, Vadakkencherry\, Kerala 678683
+URL:https://maps.app.goo.gl/3imLUGfDBieyiQkd6?g_st=iw
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-P2D
+ACTION:DISPLAY
+DESCRIPTION:Reminder: Liju & Sharon - Wedding is in 2 days (Sunday\, 24 Jan
+  2027 at 3:00 PM IST)
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Liju & Sharon | Wedding Invitation • 24 Jan 2027</title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='2' y='2' width='60' height='60' rx='16' fill='%23fffdf9' stroke='%23b58e54' stroke-width='3'/%3E%3Crect x='6' y='6' width='52' height='52' rx='12' fill='none' stroke='%23ebd6b3' stroke-width='1.5'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='24' font-weight='600' fill='%232f2724'%3EL%3Ctspan fill='%23a95c6b' font-style='normal' font-size='19'%3E%26amp;%3C/tspan%3ES%3C/text%3E%3C/svg%3E">
+        <meta name="description" content="With grateful hearts, both families joyfully invite you to celebrate the Holy Matrimony of Liju &amp; Sharon • Sunday, 24 January 2027 • Vadakkencherry, Kerala">
+        <meta name="theme-color" content="#fbf6ec">
+        <meta property="og:title" content="Liju &amp; Sharon | Wedding Invitation • 24 Jan 2027">
+        <meta property="og:description" content="Sunday, 24 January 2027 • 3:00 PM Wedding at Lourde Matha Forane Church &amp; 6:30 PM Reception at TMK Arena, Vadakkencherry">
+        <meta property="og:type" content="website">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Malayalam:wght@400;500;600;700&family=Noto+Serif+Malayalam:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap">
+
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                background-color: #fbf6ec;
+                color: #2f2724;
+            }
+            html:not(.app-ready) body {
+                overflow: hidden;
+            }
+            #main {
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.55s;
+            }
+            html.app-ready #main {
+                opacity: 1;
+                visibility: visible;
+                transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
+            }
+            #app-boot-curtain {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: radial-gradient(circle at 50% 42%, #fffdf9 0%, #fbf6ec 58%, #f4ead8 100%);
+                transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.55s;
+            }
+            html.app-ready #app-boot-curtain {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+            .boot-crest {
+                position: relative;
+                width: 118px;
+                height: 142px;
+                border-radius: 999px 999px 22px 22px;
+                border: 1px solid rgba(181, 142, 84, 0.42);
+                background: rgba(255, 253, 249, 0.78);
+                box-shadow: 0 18px 42px rgba(92, 68, 56, 0.08), inset 0 0 0 4px rgba(235, 214, 179, 0.32);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+            .boot-monogram {
+                font-family: Georgia, "Times New Roman", serif;
+                font-style: italic;
+                font-size: 26px;
+                letter-spacing: 0.06em;
+                color: #2f2724;
+                line-height: 1;
+            }
+            .boot-amp {
+                color: #a95c6b;
+                font-style: normal;
+                font-size: 20px;
+                margin: 0 3px;
+            }
+            .boot-divider {
+                width: 34px;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(181, 142, 84, 0.75), transparent);
+            }
+            .boot-date {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                font-size: 9.5px;
+                font-weight: 600;
+                letter-spacing: 0.22em;
+                color: #8b6d3f;
+                text-transform: uppercase;
+            }
+            .boot-shimmer-bar {
+                margin-top: 22px;
+                width: 84px;
+                height: 2px;
+                border-radius: 999px;
+                background: rgba(181, 142, 84, 0.2);
+                overflow: hidden;
+                position: relative;
+            }
+            .boot-shimmer-bar::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                width: 45%;
+                border-radius: 999px;
+                background: linear-gradient(90deg, transparent, #b58e54, #d68a98, transparent);
+                animation: bootSlide 1.35s ease-in-out infinite;
+            }
+            @keyframes bootSlide {
+                0% { transform: translateX(-110%); }
+                100% { transform: translateX(240%); }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                #main, #app-boot-curtain {
+                    transition: opacity 0.2s ease-out;
+                }
+                .boot-shimmer-bar::after {
+                    animation: none;
+                    width: 100%;
+                }
+            }
+        </style>
+        <script>
+            // Emergency fail-safe so the invitation is never stuck hidden if a network asset stalls
+            window.__slBootFailSafe = setTimeout(function () {
+                document.documentElement.classList.add("app-ready");
+            }, 7000);
+        </script>
+    <link rel="preload" as="script" href="/liju_sharon_wedding/assets/sharons_wedding-dxh8329f37b16fef30.js" crossorigin>    <link rel="preload" href="/liju_sharon_wedding/assets/main-dxhb6c5b49fd2e689a1.css" as="style">
+    <link rel="preload" href="/liju_sharon_wedding/assets/sharons_wedding_bg-dxh68315ed276e5879f.wasm" as="fetch" crossorigin>
+    <link rel="preload" href="/liju_sharon_wedding/assets/couple_ghibli_cameo-dxhb661d8efcbf1a8a.jpg" as="image" fetchpriority="high">
+    <link rel="preload" href="/liju_sharon_wedding/assets/hero_ghibli_garden-dxh21d1ddf2309c74de.jpg" as="image">
+  </head>
+    <body>
+        <div id="app-boot-curtain" aria-hidden="true">
+            <div class="boot-crest">
+                <div class="boot-monogram">L<span class="boot-amp">&amp;</span>S</div>
+                <div class="boot-divider"></div>
+                <div class="boot-date">24 • 01 • 2027</div>
+            </div>
+            <div class="boot-shimmer-bar"></div>
+        </div>
+        <div id="main"></div>
+    <script type="module" async src="/liju_sharon_wedding/assets/sharons_wedding-dxh8329f37b16fef30.js"></script>
+            </body>
+</html>
