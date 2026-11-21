@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const HERO_GHIBLI_BG: Asset = asset!("/assets/hero_ghibli_garden.jpg");
 const COUPLE_GHIBLI_CAMEO: Asset = asset!("/assets/couple_ghibli_cameo.jpg");
-const MEMORY_SELFIE_GHIBLI: Asset = asset!("/assets/memory_selfie_ghibli.jpg");
+const MEMORY_COUPLE_POLAROID: Asset = asset!("/assets/memory_couple_polaroid.jpg");
 
 const ROUTE_COK_AIRPORT: Asset = asset!("/assets/route_cok_airport.jpg");
 const ROUTE_THRISSUR: Asset = asset!("/assets/route_thrissur.jpg");
@@ -65,7 +65,8 @@ const ENHANCE_SCRIPT: &str = r##"
         { id: "memories", en: "Memory Wall", ml: "ഓർമ്മകളുടെ ചുവർ" },
         { id: "rsvp", en: "RSVP & Arrival", ml: "RSVP & വരവ്" },
         { id: "palette", en: "What to Wear", ml: "വസ്ത്രധാരണം" },
-        { id: "venue", en: "Visual Route", ml: "യാത്രാ മാർഗ്ഗം" },
+        { id: "travel-guide", en: "Travel & Stay", ml: "യാത്ര & താമസം" },
+        { id: "venue", en: "Way to Vadakkencherry", ml: "വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി" },
         { id: "stay-travel", en: "Where to Stay", ml: "താമസ സൗകര്യങ്ങൾ" },
     ];
     window.__slLang = window.__slLang || "en";
@@ -74,12 +75,15 @@ const ENHANCE_SCRIPT: &str = r##"
     function updateActiveSection(y, max) {
         const navSectionLabel = document.getElementById("nav-current-section");
         const popoverLinks = Array.from(document.querySelectorAll(".nav-popover a[href^='#']"));
-        let active = trackedSections[0];
+        const present = trackedSections.filter((sec) => document.getElementById(sec.id));
+        if (present.length === 0) return;
+
+        let active = present[0];
         if (y + 12 >= max) {
-            active = trackedSections[trackedSections.length - 1];
+            active = present[present.length - 1];
         } else {
             const probe = Math.max(110, Math.min(240, window.innerHeight * 0.3));
-            for (const sec of trackedSections) {
+            for (const sec of present) {
                 const el = document.getElementById(sec.id);
                 if (!el) continue;
                 const rect = el.getBoundingClientRect();
@@ -98,7 +102,12 @@ const ENHANCE_SCRIPT: &str = r##"
             }
             const targetHash = "#" + active.id;
             for (const link of popoverLinks) {
-                if (link.getAttribute("href") === targetHash) {
+                const href = link.getAttribute("href");
+                const isMatch =
+                    href === targetHash ||
+                    (active.id === "venue" && href === "#/travel") ||
+                    (active.id === "stay-travel" && href === "#/travel/stay-travel");
+                if (isMatch) {
                     link.classList.add("is-active");
                 } else {
                     link.classList.remove("is-active");
@@ -174,6 +183,7 @@ const ENHANCE_SCRIPT: &str = r##"
                 observer.observe(el);
             });
         };
+        window.__slObserveReveals = observeAll;
         observeAll();
 
         if (window.__slRevealMutation) {
@@ -200,6 +210,15 @@ const ENHANCE_SCRIPT: &str = r##"
     }
     tickCountdown();
     window.__slCountdownInterval = setInterval(tickCountdown, 60000);
+
+    window.__slRefreshPage = function () {
+        lastActiveKey = "";
+        tickCountdown();
+        updateScrollState();
+        if (window.__slObserveReveals) {
+            window.__slObserveReveals();
+        }
+    };
 
     const bgmBtn = document.getElementById("bgm-toggle-btn");
     const bgmAudio = document.getElementById("wedding-bgm");
@@ -269,6 +288,14 @@ const ENHANCE_SCRIPT: &str = r##"
         return new Promise((resolve) => {
             const start = Date.now();
             function check() {
+                const nav = document.getElementById("floating-nav");
+                if (nav) {
+                    const ncs = window.getComputedStyle(nav);
+                    if (ncs && ncs.position === "fixed") {
+                        resolve();
+                        return;
+                    }
+                }
                 const hero = document.querySelector(".hero-sanctuary");
                 if (hero) {
                     const cs = window.getComputedStyle(hero);
@@ -556,6 +583,59 @@ fn submit_rsvp_to_sheets(fields: Vec<String>, mut sync_state: Signal<SheetSyncSt
     });
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ActivePage {
+    Home,
+    Travel,
+}
+
+fn navigate_to_page(
+    mut active_page: Signal<ActivePage>,
+    target_page: ActivePage,
+    anchor: Option<&'static str>,
+) {
+    if active_page() != target_page {
+        active_page.set(target_page);
+    }
+    let hash = match (target_page, anchor) {
+        (ActivePage::Travel, Some(id)) => format!("#/travel/{id}"),
+        (ActivePage::Travel, None) => "#/travel".to_string(),
+        (ActivePage::Home, Some(id)) => format!("#{id}"),
+        (ActivePage::Home, None) => "#top".to_string(),
+    };
+    let anchor_js = match anchor {
+        Some(id) => format!("'{id}'"),
+        None => "null".to_string(),
+    };
+    let _ = document::eval(&format!(
+        r#"
+        (function () {{
+            const desiredHash = '{hash}';
+            if (window.location.hash !== desiredHash) {{
+                try {{
+                    history.pushState(null, '', desiredHash);
+                }} catch (_) {{
+                    window.location.hash = desiredHash;
+                }}
+            }}
+            const targetId = {anchor_js};
+            const go = () => {{
+                if (window.__slRefreshPage) window.__slRefreshPage();
+                if (targetId && targetId !== 'top') {{
+                    const el = document.getElementById(targetId);
+                    if (el) {{
+                        el.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+                        return;
+                    }}
+                }}
+                window.scrollTo({{ top: 0, behavior: 'auto' }});
+            }};
+            requestAnimationFrame(() => requestAnimationFrame(go));
+        }})();
+        "#
+    ));
+}
+
 fn main() {
     dioxus::launch(App);
 }
@@ -563,9 +643,70 @@ fn main() {
 #[component]
 fn App() -> Element {
     let lang = use_context_provider(|| Signal::new(Lang::En));
+    let mut active_page = use_context_provider(|| Signal::new(ActivePage::Home));
 
     use_effect(move || {
         let _ = document::eval(ENHANCE_SCRIPT);
+    });
+
+    use_effect(move || {
+        spawn(async move {
+            let mut eval = document::eval(
+                r##"
+                const resolveRoute = () => {
+                    const h = (window.location.hash || "").toLowerCase();
+                    const p = (window.location.pathname || "").toLowerCase().replace(/\/+$/, "");
+                    if (
+                        h.startsWith("#/travel") ||
+                        h === "#travel" ||
+                        h === "#venue" ||
+                        h === "#stay-travel" ||
+                        p.endsWith("/travel")
+                    ) {
+                        return "travel";
+                    }
+                    return "home";
+                };
+                const sendRoute = () => {
+                    dioxus.send(resolveRoute());
+                };
+                sendRoute();
+                if (window.__slRouteListener) {
+                    window.removeEventListener("hashchange", window.__slRouteListener);
+                    window.removeEventListener("popstate", window.__slRouteListener);
+                }
+                window.__slRouteListener = sendRoute;
+                window.addEventListener("hashchange", sendRoute);
+                window.addEventListener("popstate", sendRoute);
+                "##,
+            );
+            while let Ok(route) = eval.recv::<String>().await {
+                let next = if route == "travel" {
+                    ActivePage::Travel
+                } else {
+                    ActivePage::Home
+                };
+                if active_page() != next {
+                    active_page.set(next);
+                    let _ = document::eval(
+                        r##"
+                        requestAnimationFrame(() => requestAnimationFrame(() => {
+                            if (window.__slRefreshPage) window.__slRefreshPage();
+                            const h = (window.location.hash || "").toLowerCase();
+                            if (h === "#/travel/stay-travel" || h === "#stay-travel") {
+                                const el = document.getElementById("stay-travel");
+                                if (el) {
+                                    el.scrollIntoView({ behavior: "auto", block: "start" });
+                                    return;
+                                }
+                            }
+                            window.scrollTo({ top: 0, behavior: "auto" });
+                        }));
+                        "##,
+                    );
+                }
+            }
+        });
     });
 
     use_effect(move || {
@@ -579,26 +720,41 @@ fn App() -> Element {
     });
 
     let current_lang = lang();
+    let current_page = active_page();
 
     rsx! {
         document::Title {
-            {tr(
-                current_lang,
-                "Liju & Sharon | Wedding Invitation • 24 Jan 2027",
-                "ലിജു & ഷാരോൺ | വിവാഹ ക്ഷണക്കത്ത് • 24 ജനുവരി 2027",
-            )}
+            {match current_page {
+                ActivePage::Home => tr(
+                    current_lang,
+                    "Liju & Sharon | Wedding Invitation • 24 Jan 2027",
+                    "ലിജു & ഷാരോൺ | വിവാഹ ക്ഷണക്കത്ത് • 24 ജനുവരി 2027",
+                ),
+                ActivePage::Travel => tr(
+                    current_lang,
+                    "The Way to Vadakkencherry | Liju & Sharon • 24 Jan 2027",
+                    "വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി | ലിജു & ഷാരോൺ • 24 ജനുവരി 2027",
+                ),
+            }}
         }
         document::Stylesheet { href: MAIN_CSS }
 
         Navbar {}
         BackgroundMusicFab {}
         main { class: if current_lang == Lang::Ml { "page-shell lang-ml" } else { "page-shell" },
-            HeroInvitationScene {}
-            EventsSection {}
-            MemoryWallSection {}
-            RsvpSection {}
-            AttireSection {}
-            VenueAndTravelSection {}
+            match current_page {
+                ActivePage::Home => rsx! {
+                    HeroInvitationScene {}
+                    EventsSection {}
+                    MemoryWallSection {}
+                    RsvpSection {}
+                    AttireSection {}
+                    TravelGuideTeaserSection {}
+                },
+                ActivePage::Travel => rsx! {
+                    TravelPageView {}
+                },
+            }
         }
         Footer {}
     }
@@ -607,8 +763,10 @@ fn App() -> Element {
 #[component]
 fn Navbar() -> Element {
     let mut lang = use_context::<Signal<Lang>>();
+    let active_page = use_context::<Signal<ActivePage>>();
     let mut menu_open = use_signal(|| false);
     let current = lang();
+    let current_page = active_page();
 
     rsx! {
         div { id: "scroll-progress", class: "scroll-progress-bar", "aria-hidden": "true" }
@@ -625,7 +783,11 @@ fn Navbar() -> Element {
                     a {
                         href: "#top",
                         class: "nav-monogram",
-                        onclick: move |_| menu_open.set(false),
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, None);
+                        },
                         "L & S"
                     }
                     span { class: "nav-dot-sep", "aria-hidden": "true", "•" }
@@ -639,7 +801,10 @@ fn Navbar() -> Element {
                         span {
                             id: "nav-current-section",
                             class: "nav-current-label",
-                            "{tr(current, \"Invitation\", \"ക്ഷണക്കത്ത്\")}"
+                            {match current_page {
+                                ActivePage::Home => tr(current, "Invitation", "ക്ഷണക്കത്ത്"),
+                                ActivePage::Travel => tr(current, "Way to Vadakkencherry", "വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി"),
+                            }}
                         }
                     }
                     button {
@@ -658,7 +823,11 @@ fn Navbar() -> Element {
                     a {
                         href: "#rsvp",
                         class: "nav-rsvp-pill",
-                        onclick: move |_| menu_open.set(false),
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, Some("rsvp"));
+                        },
                         "RSVP"
                     }
                 }
@@ -666,18 +835,76 @@ fn Navbar() -> Element {
                 div {
                     class: if menu_open() { "nav-popover is-open" } else { "nav-popover" },
                     aria_hidden: if menu_open() { "false" } else { "true" },
-                    a { href: "#invitation", onclick: move |_| menu_open.set(false), "{tr(current, \"Invitation\", \"ക്ഷണക്കത്ത്\")}" }
-                    a { href: "#events", onclick: move |_| menu_open.set(false), "{tr(current, \"The Wedding Day\", \"വിവാഹ ദിനം\")}" }
-                    a { href: "#memories", onclick: move |_| menu_open.set(false), "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}" }
+                    a {
+                        href: "#invitation",
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, Some("invitation"));
+                        },
+                        "{tr(current, \"Invitation\", \"ക്ഷണക്കത്ത്\")}"
+                    }
+                    a {
+                        href: "#events",
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, Some("events"));
+                        },
+                        "{tr(current, \"The Wedding Day\", \"വിവാഹ ദിനം\")}"
+                    }
+                    a {
+                        href: "#memories",
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, Some("memories"));
+                        },
+                        "{tr(current, \"Memory Wall\", \"ഓർമ്മകളുടെ ചുവർ\")}"
+                    }
                     a {
                         href: "#rsvp",
                         class: "popover-rsvp-link",
-                        onclick: move |_| menu_open.set(false),
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, Some("rsvp"));
+                        },
                         "{tr(current, \"RSVP & Arrival →\", \"RSVP & വരവ് →\")}"
                     }
-                    a { href: "#palette", onclick: move |_| menu_open.set(false), "{tr(current, \"What to Wear\", \"വസ്ത്രധാരണം\")}" }
-                    a { href: "#venue", onclick: move |_| menu_open.set(false), "{tr(current, \"Visual Route\", \"യാത്രാ മാർഗ്ഗം\")}" }
-                    a { href: "#stay-travel", onclick: move |_| menu_open.set(false), "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}" }
+                    a {
+                        href: "#palette",
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Home, Some("palette"));
+                        },
+                        "{tr(current, \"What to Wear\", \"വസ്ത്രധാരണം\")}"
+                    }
+                    div { class: "nav-popover-divider", "aria-hidden": "true" }
+                    a {
+                        href: "#/travel",
+                        class: if current_page == ActivePage::Travel {
+                            "popover-travel-link is-active"
+                        } else {
+                            "popover-travel-link"
+                        },
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Travel, None);
+                        },
+                        "{tr(current, \"Way to Vadakkencherry →\", \"വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി →\")}"
+                    }
+                    a {
+                        href: "#/travel/stay-travel",
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            menu_open.set(false);
+                            navigate_to_page(active_page, ActivePage::Travel, Some("stay-travel"));
+                        },
+                        "{tr(current, \"Where to Stay\", \"താമസ സൗകര്യങ്ങൾ\")}"
+                    }
                 }
             }
         }
@@ -891,7 +1118,6 @@ fn HeroInvitationScene() -> Element {
 
                         div { class: "hero-actions",
                             a { href: "#rsvp", class: "btn btn-rose", "{tr(lang, \"RSVP & Arrival\", \"RSVP & വരവ്\")}" }
-                            a { href: "#venue", class: "btn btn-ivory-outline", "{tr(lang, \"Visual Route ↓\", \"യാത്രാ മാർഗ്ഗം ↓\")}" }
                         }
                     }
                 }
@@ -1391,7 +1617,7 @@ fn VenueAndTravelSection() -> Element {
                                     }
                                     li {
                                         strong { "സഹായം ആവശ്യമുണ്ടോ? " }
-                                        "താഴെയുള്ള RSVP-യിൽ നിങ്ങളുടെ എത്തുന്ന സമയം രേഖപ്പെടുത്തിയാൽ ഞങ്ങളുടെ കുടുംബം സഹായിക്കുന്നതാണ്."
+                                        "ക്ഷണക്കത്തിലെ RSVP-യിൽ നിങ്ങളുടെ എത്തുന്ന സമയം രേഖപ്പെടുത്തിയാൽ ഞങ്ങളുടെ കുടുംബം സഹായിക്കുന്നതാണ്."
                                     }
                                 }
                             } else {
@@ -1411,7 +1637,7 @@ fn VenueAndTravelSection() -> Element {
                                     }
                                     li {
                                         strong { "Need Help Arranging? " }
-                                        "Drop your arrival time in the RSVP below and our family can help coordinate."
+                                        "Drop your arrival time in the RSVP on the invitation page and our family can help coordinate."
                                     }
                                 }
                             }
@@ -1419,6 +1645,96 @@ fn VenueAndTravelSection() -> Element {
                     }
                 }
 
+            }
+        }
+    }
+}
+
+#[component]
+fn TravelGuideTeaserSection() -> Element {
+    let lang = use_context::<Signal<Lang>>()();
+    let active_page = use_context::<Signal<ActivePage>>();
+
+    rsx! {
+        section { id: "travel-guide", class: "chapter-travel-teaser",
+            div { class: "section-container",
+                div { class: "travel-teaser-card", "data-reveal": "",
+                    span { class: "section-eyebrow",
+                        "{tr(lang, \"Route, Stay & Getting Around\", \"യാത്രാ മാർഗ്ഗവും താമസവും\")}"
+                    }
+                    h2 { class: "travel-teaser-heading",
+                        "{tr(lang, \"The Way to Vadakkencherry\", \"വടക്കഞ്ചേരിയിലേക്കുള്ള വഴി\")}"
+                    }
+                    div { class: "filigree-divider" }
+                    p { class: "travel-teaser-copy",
+                        "{tr(lang, \"Explore our visual route from Kochi and Thrissur, directions to Lourde Matha Forane Church & TMK Arena, nearby Airbnbs, and local commute tips.\", \"കൊച്ചിയിൽ നിന്നും തൃശ്ശൂരിൽ നിന്നുമുള്ള യാത്രാ മാർഗ്ഗം, പള്ളിയിലേക്കും TMK അരീനയിലേക്കുമുള്ള വഴി, സമീപത്തെ താമസ സൗകര്യങ്ങൾ എന്നിവ ഇവിടെ കാണാം.\")}"
+                    }
+                    div { class: "travel-teaser-actions",
+                        a {
+                            href: "#/travel",
+                            class: "btn btn-rose",
+                            onclick: move |evt| {
+                                evt.prevent_default();
+                                navigate_to_page(active_page, ActivePage::Travel, None);
+                            },
+                            "{tr(lang, \"Open Travel & Stay Guide →\", \"യാത്രാ & താമസ ഗൈഡ് തുറക്കുക →\")}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn TravelPageView() -> Element {
+    let lang = use_context::<Signal<Lang>>()();
+    let active_page = use_context::<Signal<ActivePage>>();
+
+    rsx! {
+        div { id: "top", class: "travel-standalone-page",
+            div { class: "travel-page-topbar",
+                a {
+                    href: "#top",
+                    class: "travel-back-pill",
+                    onclick: move |evt| {
+                        evt.prevent_default();
+                        navigate_to_page(active_page, ActivePage::Home, None);
+                    },
+                    "{tr(lang, \"← Back to Wedding Invitation\", \"← വിവാഹ ക്ഷണക്കത്തിലേക്ക്\")}"
+                }
+            }
+
+            VenueAndTravelSection {}
+
+            div { class: "travel-page-bottom-bar",
+                div { class: "section-container",
+                    div { class: "travel-bottom-cta-card", "data-reveal": "",
+                        p { class: "travel-bottom-note",
+                            "{tr(lang, \"Ready to confirm your presence or share your arrival plan?\", \"നിങ്ങളുടെ വരവും സമയവും RSVP-യിൽ പങ്കുവെക്കാം.\")}"
+                        }
+                        div { class: "travel-bottom-actions",
+                            a {
+                                href: "#top",
+                                class: "btn btn-ivory-outline",
+                                onclick: move |evt| {
+                                    evt.prevent_default();
+                                    navigate_to_page(active_page, ActivePage::Home, None);
+                                },
+                                "{tr(lang, \"← Back to Invitation\", \"← ക്ഷണക്കത്തിലേക്ക്\")}"
+                            }
+                            a {
+                                href: "#rsvp",
+                                class: "btn btn-rose",
+                                onclick: move |evt| {
+                                    evt.prevent_default();
+                                    navigate_to_page(active_page, ActivePage::Home, Some("rsvp"));
+                                },
+                                "{tr(lang, \"RSVP & Arrival\", \"RSVP & വരവ്\")}"
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -2031,7 +2347,7 @@ fn MemoryWallSection() -> Element {
                 }
 
                 div { class: "memory-wall-board", "data-reveal": "",
-                    /* Left: Single Clickable Couple Selfie Polaroid */
+                    /* Left: Single Clickable Couple Polaroid */
                     div { class: "memory-polaroid-grid is-single",
                         a {
                             href: "{MEMORY_WALL_URL}",
@@ -2041,8 +2357,8 @@ fn MemoryWallSection() -> Element {
                             span { class: "polaroid-pin pin-rose", "aria-hidden": "true" }
                             div { class: "polaroid-photo-frame",
                                 img {
-                                    src: MEMORY_SELFIE_GHIBLI,
-                                    alt: "Liju & Sharon selfie — open Google Photos Memory Wall",
+                                    src: MEMORY_COUPLE_POLAROID,
+                                    alt: "Liju & Sharon — tap to add wedding pictures to our Google Photos Memory Wall",
                                     loading: "lazy",
                                     decoding: "async",
                                 }
@@ -2050,16 +2366,19 @@ fn MemoryWallSection() -> Element {
                             span { class: "polaroid-caption",
                                 "{tr(lang, \"Liju & Sharon\", \"ലിജു & ഷാരോൺ\")}"
                             }
+                            span { class: "polaroid-subcaption",
+                                "{tr(lang, \"Add wedding pictures here ↗\", \"വിവാഹ ചിത്രങ്ങൾ ഇവിടെ ചേർക്കാം ↗\")}"
+                            }
                         }
                     }
 
                     /* Right: Compact Shared Album Drop & View Hub */
                     div { class: "memory-drop-hub",
                         h3 { class: "memory-hub-title",
-                            "{tr(lang, \"Add Your Favourite Photos & Videos\", \"നിങ്ങളുടെ പ്രിയപ്പെട്ട ചിത്രങ്ങളും വീഡിയോകളും ചേർക്കൂ\")}"
+                            "{tr(lang, \"Add Your Memories & Wedding Pictures Here\", \"നിങ്ങളുടെ ഓർമ്മകളും വിവാഹ ചിത്രങ്ങളും ഇവിടെ ചേർക്കാം\")}"
                         }
                         p { class: "memory-hub-copy",
-                            "{tr(lang, \"Add any pictures you like, favourite throwback moments, candid clicks, or short clips straight into our shared Google Photos album.\", \"നിങ്ങൾക്കിഷ്ടപ്പെട്ട ചിത്രങ്ങളും, പ്രിയപ്പെട്ട ഓർമ്മകളും, ചെറു വീഡിയോകളും നമ്മുടെ പങ്കുവെച്ച ഗൂഗിൾ ഫോട്ടോസ് ആൽബത്തിലേക്ക് നേരിട്ട് ചേർക്കാം.\")}"
+                            "{tr(lang, \"Feel free to add memories and pictures from the wedding — favourite throwback moments, candid clicks, and short clips straight into our shared Google Photos album.\", \"വിവാഹത്തിന്റെ ചിത്രങ്ങളും നിങ്ങളുടെ പ്രിയപ്പെട്ട ഓർമ്മകളും, ചെറു വീഡിയോകളും നമ്മുടെ പങ്കുവെച്ച ഗൂഗിൾ ഫോട്ടോസ് ആൽബത്തിലേക്ക് ധൈര്യമായി ചേർക്കാം.\")}"
                         }
 
                         div { class: "memory-cta-stack",
@@ -2108,6 +2427,7 @@ fn MemoryWallSection() -> Element {
 #[component]
 fn Footer() -> Element {
     let lang = use_context::<Signal<Lang>>()();
+    let active_page = use_context::<Signal<ActivePage>>();
 
     rsx! {
         footer { class: "site-footer",
@@ -2115,6 +2435,10 @@ fn Footer() -> Element {
                 a {
                     href: "#top",
                     class: if lang == Lang::Ml { "footer-script footer-script-ml" } else { "footer-script" },
+                    onclick: move |evt| {
+                        evt.prevent_default();
+                        navigate_to_page(active_page, ActivePage::Home, None);
+                    },
                     "{tr(lang, \"Liju & Sharon\", \"ലിജു & ഷാരോൺ\")}"
                 }
                 p { class: "footer-date",
@@ -2123,7 +2447,14 @@ fn Footer() -> Element {
                 p { class: "footer-families",
                     "{tr(lang, \"With love, Liya, Aaron & Hrudya\", \"സ്നേഹത്തോടെ, ലിയ, ആരൺ & ഹൃദ്യ\")}"
                 }
-                a { href: "#top", class: "footer-top-link", "{tr(lang, \"Back to Top ↑\", \"മുകളിലേക്ക് ↑\")}" }
+                button {
+                    r#type: "button",
+                    class: "footer-top-link",
+                    onclick: move |_| {
+                        let _ = document::eval("window.scrollTo({ top: 0, behavior: 'smooth' });");
+                    },
+                    "{tr(lang, \"Back to Top ↑\", \"മുകളിലേക്ക് ↑\")}"
+                }
             }
         }
     }
